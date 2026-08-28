@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASLA Express | بوابة العملاء الاحترافية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Readex+Pro:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #07090e;
+            --surface: rgba(18, 24, 38, 0.75);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #00f2fe;
+            --primary-glow: rgba(0, 242, 254, 0.3);
+            --secondary: #4facfe;
+            --accent: #6366f1;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; font-family: 'Readex Pro', sans-serif; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            background-image: radial-gradient(circle at 50% 0%, #1e1b4b, transparent 70%); 
+        }
+
+        /* Responsive Navigation */
+        nav { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 5%; 
+            background: rgba(7, 9, 14, 0.85); 
+            backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--border); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+        }
+        .logo { 
+            font-size: 20px; 
+            font-weight: 700; 
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        /* Auth Portal */
+        .auth-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 70px);
+            padding: 15px;
+            position: relative;
+        }
+        .hero-glow { 
+            position: absolute; 
+            width: 300px; 
+            height: 300px; 
+            background: var(--primary); 
+            filter: blur(140px); 
+            border-radius: 50%; 
+            opacity: 0.2; 
+            z-index: -1; 
+        }
+
+        .glass-card { 
+            background: var(--surface); 
+            backdrop-filter: blur(24px); 
+            border: 1px solid var(--border); 
+            border-radius: 20px; 
+            padding: 25px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+        }
+        .auth-container { 
+            width: 100%; 
+            max-width: 420px; 
+            animation: floatUp 0.6s ease; 
+        }
+
+        /* Responsive Inputs & Buttons */
+        .form-group { margin-bottom: 15px; text-align: right; }
+        label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 12px; font-weight: 500; }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px 14px; 
+            background: rgba(3, 7, 18, 0.7); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            color: #fff; 
+            font-size: 14px; 
+            outline: none; 
+        }
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 15px var(--primary-glow); 
+        }
+
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            color: #000; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 14px; 
+            cursor: pointer; 
+            box-shadow: 0 8px 20px var(--primary-glow); 
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px var(--primary-glow); }
+
+        /* Dashboard Layout Rules */
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px 15px; animation: floatUp 0.6s ease; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+
+        .tabs { 
+            display: flex; 
+            gap: 8px; 
+            overflow-x: auto; 
+            padding: 10px 0; 
+            margin: 20px 0 10px; 
+            border-bottom: 1px solid var(--border); 
+            -webkit-overflow-scrolling: touch; 
+        }
+        .tab-btn { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid var(--border); 
+            color: var(--text-muted); 
+            padding: 10px 18px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            white-space: nowrap; 
+            font-weight: 500; 
+            font-size: 12px; 
+            flex-shrink: 0;
+        }
+        .tab-btn.active { background: var(--primary); color: #000; font-weight: 700; border-color: var(--primary); }
+
+        .order-card { background: rgba(18, 24, 38, 0.9); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-top: 12px; position: relative; overflow: hidden; }
+        .order-card::before { content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: var(--primary); }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(0, 242, 254, 0.1); color: var(--primary); border: 1px solid rgba(0, 242, 254, 0.2); }
+        
+        .timeline { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; background: rgba(3, 7, 18, 0.5); padding: 10px 14px; border-radius: 10px; margin-top: 12px; font-size: 11px; color: var(--text-muted); border: 1px solid var(--border); }
+        .issue-alert { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 12px; }
+
+        .hidden { display: none !important; }
+        @keyframes floatUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Mobile Breakpoints */
+        @media (max-width: 600px) {
+            .glass-card { padding: 20px 15px; }
+            .logo { font-size: 18px; }
+            #user-nav-status { font-size: 12px; }
+            .timeline { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">WASLA Express 🚀</div>
+    <div id="user-nav-status" style="color: var(--text-muted);">بوابة العملاء</div>
+</nav>
+
+<div class="auth-wrapper" id="auth-screen">
+    <div class="hero-glow"></div>
+    <div class="auth-container glass-card">
+        <h2 style="text-align: center; margin-top: 0; font-size: 22px;">تسجيل دخول التاجر</h2>
+        <p style="text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 25px;">أدخل بيانات حسابك للوصول لنظام الشحنات</p>
+        
+        <div class="form-group">
+            <label>اسم المستخدم / اسم المتجر</label>
+            <input type="text" id="username" placeholder="مثال: متجر الأناقة">
+        </div>
+        <div class="form-group">
+            <label>كلمة المرور</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+        <button class="btn" onclick="login()">دخول المنصة ➔</button>
+    </div>
+</div>
+
+<div class="container hidden" id="app-screen">
+    <div class="glass-card" style="margin-bottom: 20px; padding: 15px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <h2 style="margin: 0; font-size: 18px;">مرحباً بك، <span id="user-display" style="color: var(--primary);"></span> 📦</h2>
+            <button class="btn" style="width: auto; background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow:none; padding: 6px 14px; font-size: 12px;" onclick="logout()">خروج</button>
+        </div>
+    </div>
+
+    <div class="glass-card">
+        <h3 style="margin-top: 0; color: var(--primary); font-size: 16px;">+ تسجيل وتسليم شحنة جديدة</h3>
+        <form onsubmit="createOrder(event)">
+            <div class="grid-3">
+                <div class="form-group"><label>اسم المستلم</label><input type="text" id="c-name" required placeholder="الاسم الثلاثي"></div>
+                <div class="form-group"><label>رقم الهاتف الأساسي</label><input type="tel" id="c-phone1" required placeholder="01xxxxxxxxx"></div>
+                <div class="form-group"><label>رقم هاتف إضافي</label><input type="tel" id="c-phone2" placeholder="01xxxxxxxxx"></div>
+            </div>
+
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>المحافظة</label>
+                    <select id="c-gov" required>
+                        <option value="">اختر المحافظة</option>
+                        <option>القاهرة</option><option>الجيزة</option><option>الإسكندرية</option>
+                        <option>القليوبية</option><option>الشرقية</option><option>الدقهلية</option>
+                        <option>البحيرة</option><option>المنوفية</option><option>الغربية</option>
+                        <option>كفر الشيخ</option><option>الفيوم</option><option>بني سويف</option>
+                        <option>المنيا</option><option>أسيوط</option><option>سوهاج</option>
+                        <option>قنا</option><option>الأقصر</option><option>أسوان</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>العنوان بالتفصيل</label><input type="text" id="c-address" required placeholder="المنطقة - الشارع - رقم العمارة"></div>
+                <div class="form-group">
+                    <label>سرعة التوصيل</label>
+                    <select id="c-speed" required>
+                        <option>خلال 24 ساعة (عاجل)</option>
+                        <option>خلال يومين (48 ساعة)</option>
+                        <option>شحن عادي (3-5 أيام)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group"><label>تفاصيل الشحنة</label><textarea id="c-details" rows="2" required placeholder="الوصف والعدد والألوان..."></textarea></div>
+                <div class="form-group"><label>المبلغ المطلوب تحصيله (ج.م)</label><input type="number" id="c-price" required></div>
+            </div>
+            <button type="submit" class="btn">حفظ وإرسال الشحنة لـ WASLA 🚀</button>
+        </form>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('جديد', this)">أوردرات جديدة</button>
+        <button class="tab-btn" onclick="switchTab('تم تسليم للمندوب', this)">مع المندوب</button>
+        <button class="tab-btn" onclick="switchTab('تم تسليم للعميل', this)">تم التسليم بنجاح</button>
+        <button class="tab-btn" onclick="switchTab('استلم جزء من الاوردر', this)">تسليم جزئي</button>
+        <button class="tab-btn" onclick="switchTab('رفض استلام الاوردر', this)">مرفوض</button>
+        <button class="tab-btn" onclick="switchTab('عدم التسليم بنجاح', this)">مُعلق / لم يتم التسليم</button>
+    </div>
+
+    <div id="orders-list"></div>
+</div>
+
+<script>
+    let currentUser = localStorage.getItem('wasla_pro_user') || null;
+
+    window.onload = function() {
+        if (currentUser) showDashboard();
+    };
+
+    function login() {
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        if (u && p) {
+            currentUser = u;
+            localStorage.setItem('wasla_pro_user', u);
+            showDashboard();
+        } else {
+            alert('يرجى كتابة اسم المستخدم وكلمة المرور للدخول');
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('wasla_pro_user');
+        location.reload();
+    }
+
+    function showDashboard() {
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        document.getElementById('user-display').innerText = currentUser;
+        document.getElementById('user-nav-status').innerText = 'الحساب: ' + currentUser;
+        renderOrders('جديد');
+    }
+
+    function createOrder(e) {
+        e.preventDefault();
+        const orders = JSON.parse(localStorage.getItem('wasla_pro_orders') || '[]');
+        const newOrder = {
+            id: 'WASLA-' + Math.floor(100000 + Math.random() * 900000),
+            user: currentUser,
+            customer: document.getElementById('c-name').value,
+            phone1: document.getElementById('c-phone1').value,
+            phone2: document.getElementById('c-phone2').value || 'لا يوجد',
+            gov: document.getElementById('c-gov').value,
+            address: document.getElementById('c-address').value,
+            speed: document.getElementById('c-speed').value,
+            details: document.getElementById('c-details').value,
+            price: document.getElementById('c-price').value,
+            status: 'جديد',
+            createdDate: new Date().toLocaleDateString('ar-EG'),
+            pickupDate: 'في انتظار الاستلام',
+            deliveryEst: 'قيد التحديد',
+            issueLog: ''
+        };
+        orders.push(newOrder);
+        localStorage.setItem('wasla_pro_orders', JSON.stringify(orders));
+        e.target.reset();
+        alert('تم تسجيل الشحنة بنجاح!');
+        renderOrders('جديد');
+    }
+
+    function switchTab(status, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderOrders(status);
+    }
+
+    function renderOrders(status) {
+        const orders = JSON.parse(localStorage.getItem('wasla_pro_orders') || '[]');
+        const filtered = orders.filter(o => o.user === currentUser && o.status === status);
+        const container = document.getElementById('orders-list');
+        container.innerHTML = '';
+
+        if (!filtered.length) {
+            container.innerHTML = `<p style="text-align:center; color:var(--text-muted); margin-top:20px; font-size:13px;">لا توجد شحنات تحت تصنيف "${status}" حالياً</p>`;
+            return;
+        }
+
+        filtered.forEach(o => {
+            container.innerHTML += `
+                <div class="order-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h4 style="margin:0; color:var(--primary); font-size: 15px;">كود: ${o.id}</h4>
+                        <span class="status-badge">${o.status}</span>
+                    </div>
+                    <p style="margin:8px 0 4px; font-size:13px;"><strong>المستلم:</strong> ${o.customer} (${o.phone1} / ${o.phone2})</p>
+                    <p style="margin:0 0 4px; color:var(--text-muted); font-size:12px;"><strong>العنوان:</strong> ${o.gov} - ${o.address}</p>
+                    <p style="margin:0 0 4px; color:var(--text-muted); font-size:12px;"><strong>المحتوى:</strong> ${o.details} | <span style="color:var(--primary);">${o.speed}</span></p>
+                    <p style="margin:4px 0 0; color:#4ade80; font-weight:700; font-size:13px;"><strong>المبلغ:</strong> ${o.price} ج.م</p>
+                    
+                    <div class="timeline">
+                        <span>📅 الطلب: ${o.createdDate}</span>
+                        <span>🚚 الاستلام: ${o.pickupDate}</span>
+                        <span>⏱️ المتوقع: ${o.deliveryEst}</span>
+                    </div>
+                    ${o.issueLog ? `<div class="issue-alert">⚠️ <strong>ملاحظة WASLA:</strong> ${o.issueLog}</div>` : ''}
+                </div>
+            `;
+        });
+    }
+</script>
+</body>
+</html>

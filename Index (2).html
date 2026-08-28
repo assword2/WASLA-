@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASLA Express | غرفة التحكم اللوجستية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #07090e; --surface: #121826; --border: rgba(255, 255, 255, 0.08); --primary: #00f2fe; --text: #f8fafc; --text-muted: #94a3b8; }
+        * { box-sizing: border-box; font-family: 'Readex Pro', sans-serif; transition: all 0.3s ease; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; background: var(--surface); border: 1px solid var(--border); padding: 15px 20px; border-radius: 16px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .logo { font-size: 18px; font-weight: 700; color: var(--primary); }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+        .tab-btn.active { background: var(--primary); color: #000; font-weight: 700; }
+
+        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; background: var(--surface); min-width: 750px; }
+        th, td { border-bottom: 1px solid var(--border); padding: 10px; text-align: center; }
+        th { background: rgba(255, 255, 255, 0.03); color: var(--primary); font-weight: 700; }
+
+        input, select, textarea { padding: 6px 8px; border-radius: 6px; background: #030712; border: 1px solid var(--border); color: #fff; font-size: 11px; width: 100%; }
+        .btn-act { background: var(--primary); color: #000; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 11px; margin-top: 3px; }
+        
+        .client-sheet-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 15px; border-right: 4px solid var(--primary); }
+        .hidden { display: none; }
+
+        #waybill-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); justify-content:center; align-items:center; z-index: 1000; padding: 15px; }
+        .waybill-box { background: #fff; padding: 20px; border-radius: 12px; width: 100%; max-width: 500px; color:#000; max-height: 90vh; overflow-y: auto; }
+        @media print { body * { visibility: hidden; } #waybill-content, #waybill-content * { visibility: visible; } #waybill-content { position: absolute; left:0; top:0; width:100%; border:none; } .no-print { display:none; } }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .header { padding: 12px 15px; }
+            .logo { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">WASLA Express | غرفة التحكم ⚙️</div>
+    <button class="btn-act" style="padding: 8px 16px; margin: 0;" onclick="loadData()">تحديث البيانات 🔄</button>
+</div>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchAdminTab('all', this)">جميع الشحنات الواردة</button>
+    <button class="tab-btn" onclick="switchAdminTab('sheets', this)">📋 شيتات العملاء المجمعة</button>
+</div>
+
+<div id="all-sec">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>الكود</th>
+                    <th>التاجر</th>
+                    <th>المستلم والهواتف</th>
+                    <th>العنوان</th>
+                    <th>المحتوى والمبلغ</th>
+                    <th>تحديث اللوجستيات</th>
+                    <th>الملاحظات والمشاكل</th>
+                    <th>الحالة والإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="admin-table"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="sheets-sec" class="hidden">
+    <div id="sheets-container"></div>
+</div>
+
+<div id="waybill-modal">
+    <div class="waybill-box" id="waybill-content">
+        <div style="display:flex; justify-content:space-between; border-bottom:2px solid #000; padding-bottom:8px; margin-bottom:8px;">
+            <h2 style="margin:0; font-size: 18px;">WASLA Express</h2>
+            <h3 id="wb-id" style="margin:0; font-size: 16px;"></h3>
+        </div>
+        <p style="margin: 5px 0;"><strong>الراسل:</strong> <span id="wb-sender"></span></p><hr>
+        <p style="margin: 5px 0;"><strong>المستلم:</strong> <span id="wb-receiver"></span></p>
+        <p style="margin: 5px 0;"><strong>الهواتف:</strong> <span id="wb-phones"></span></p>
+        <p style="margin: 5px 0;"><strong>العنوان:</strong> <span id="wb-address"></span></p>
+        <p style="margin: 5px 0;"><strong>سرعة التوصيل:</strong> <span id="wb-speed"></span></p><hr>
+        <p style="margin: 5px 0;"><strong>تفاصيل الطرد:</strong> <span id="wb-details"></span></p>
+        <h3 style="background:#f1f5f9; padding:8px; text-align:center; border:1px solid #000; margin: 10px 0; font-size: 15px;">المبلغ للتحصيل: <span id="wb-price"></span> ج.م</h3>
+        <div class="no-print" style="display:flex; gap:8px; margin-top:12px;">
+            <button onclick="window.print()" class="btn-act" style="flex:1;">طباعة البوليصة 🖨️</button>
+            <button onclick="closeWaybill()" style="background:#ef4444; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; font-size: 11px;">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchAdminTab(type, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (type === 'all') {
+            document.getElementById('all-sec').classList.remove('hidden');
+            document.getElementById('sheets-sec').classList.add('hidden');
+        } else {
+            document.getElementById('all-sec').classList.add('hidden');
+            document.getElementById('sheets-sec').classList.remove('hidden');
+            renderSheets();
+        }
+    }
+
+    function loadData() {
+        const orders = JSON.parse(localStorage.getItem('wasla_pro_orders') || '[]');
+        const tbody = document.getElementById('admin-table');
+        tbody.innerHTML = '';
+
+        if(!orders.length) { tbody.innerHTML = '<tr><td colspan="8">لا توجد أوردرات حتى الآن</td></tr>'; return; }
+
+        orders.forEach(o => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${o.id}</b></td>
+                    <td><b style="color:var(--primary);">${o.user}</b></td>
+                    <td>${o.customer}<br><small>${o.phone1} / ${o.phone2}</small></td>
+                    <td><b>${o.gov}</b><br>${o.address}</td>
+                    <td>${o.details}<br><b style="color:#4ade80;">${o.price} ج.م</b></td>
+                    <td>
+                        <label style="font-size:10px;">تاريخ الاستلام:</label><input type="text" id="pickup-${o.id}" value="${o.pickupDate}">
+                        <label style="font-size:10px;">التسليم المتوقع:</label>
+                        <select id="est-${o.id}">
+                            <option value="اليوم" ${o.deliveryEst === 'اليوم' ? 'selected' : ''}>اليوم</option>
+                            <option value="غداً" ${o.deliveryEst === 'غداً' ? 'selected' : ''}>غداً</option>
+                            <option value="خلال 48 ساعة" ${o.deliveryEst === 'خلال 48 ساعة' ? 'selected' : ''}>خلال 48 ساعة</option>
+                            <option value="قيد التحديد" ${o.deliveryEst === 'قيد التحديد' ? 'selected' : ''}>قيد التحديد</option>
+                        </select>
+                    </td>
+                    <td><textarea id="issue-${o.id}" rows="2" placeholder="ملاحظات المندوب...">${o.issueLog || ''}</textarea></td>
+                    <td>
+                        <select id="status-${o.id}">
+                            <option value="جديد" ${o.status === 'جديد' ? 'selected' : ''}>جديد</option>
+                            <option value="تم تسليم للمندوب" ${o.status === 'تم تسليم للمندوب' ? 'selected' : ''}>تم تسليم للمندوب</option>
+                            <option value="تم تسليم للعميل" ${o.status === 'تم تسليم للعميل' ? 'selected' : ''}>تم تسليم للعميل</option>
+                            <option value="استلم جزء من الاوردر" ${o.status === 'استلم جزء من الاوردر' ? 'selected' : ''}>استلم جزء من الاوردر</option>
+                            <option value="رفض استلام الاوردر" ${o.status === 'رفض استلام الاوردر' ? 'selected' : ''}>رفض استلام الاوردر</option>
+                            <option value="عدم التسليم بنجاح" ${o.status === 'عدم التسليم بنجاح' ? 'selected' : ''}>عدم التسليم بنجاح</option>
+                        </select>
+                        <button class="btn-act" onclick="saveChanges('${o.id}')">حفظ 💾</button>
+                        <button class="btn-act" style="background:#10b981;" onclick="openWaybill('${o.id}')">البوليصة 📄</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderSheets() {
+        const orders = JSON.parse(localStorage.getItem('wasla_pro_orders') || '[]');
+        const container = document.getElementById('sheets-container');
+        container.innerHTML = '';
+
+        if (!orders.length) { container.innerHTML = '<p style="font-size:13px;">لا توجد بيانات متاحة.</p>'; return; }
+
+        const grouped = {};
+        orders.forEach(o => {
+            if (!grouped[o.user]) grouped[o.user] = [];
+            grouped[o.user].push(o);
+        });
+
+        for (let user in grouped) {
+            const userOrders = grouped[user];
+            const totalCash = userOrders.reduce((sum, item) => sum + Number(item.price), 0);
+            
+            let tableRows = userOrders.map(o => `
+                <tr>
+                    <td>${o.id}</td>
+                    <td>${o.customer}</td>
+                    <td>${o.phone1}</td>
+                    <td>${o.gov}</td>
+                    <td>${o.price} ج.م</td>
+                    <td><b>${o.status}</b></td>
+                </tr>
+            `).join('');
+
+            container.innerHTML += `
+                <div class="client-sheet-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                        <h3 style="margin:0; color:var(--primary); font-size: 15px;">📋 شيت التاجر: ${user}</h3>
+                        <div style="font-size: 12px;">إجمالي الشحنات: <b>${userOrders.length}</b> | المبالغ: <b style="color:#4ade80;">${totalCash} ج.م</b></div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>الكود</th><th>اسم المستلم</th><th>الهاتف</th><th>المحافظة</th><th>المبلغ</th><th>الحالة</th></tr>
+                            </thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function saveChanges(id) {
+        let orders = JSON.parse(localStorage.getItem('wasla_pro_orders') || '[]');
+        orders = orders.map(o => {
+            if (o.id === id) {
+                o.pickupDate = document.getElementById(`pickup-${id}`).value;
+                o.deliveryEst = document.getElementById(`est-${id}`).value;
+                o.issueLog = document.getElementById(`issue-${id}`).value;
+                o.status = document.getElementById(`status-${id}`).value;
+            }
+            return o;
+        });
+        localStorage.setItem('wasla_pro_orders', JSON.stringify(orders));
+        alert('تم الحفظ وتثبيت البيانات!');
+        loadData();
+    }
+
+    function openWaybill(id) {
+        const orders = JSON.parse(localStorage.getItem('wasla_pro_orders') || '[]');
+        const o = orders.find(item => item.id === id);
+        if (!o) return;
+
+        document.getElementById('wb-id').innerText = o.id;
+        document.getElementById('wb-sender').innerText = o.user;
+        document.getElementById('wb-receiver').innerText = o.customer;
+        document.getElementById('wb-phones').innerText = `${o.phone1} / ${o.phone2}`;
+        document.getElementById('wb-address').innerText = `${o.gov} - ${o.address}`;
+        document.getElementById('wb-speed').innerText = o.speed;
+        document.getElementById('wb-details').innerText = o.details;
+        document.getElementById('wb-price').innerText = o.price;
+
+        document.getElementById('waybill-modal').style.display = 'flex';
+    }
+
+    function closeWaybill() { document.getElementById('waybill-modal').style.display = 'none'; }
+
+    loadData();
+</script>
+</body>
+</html>
