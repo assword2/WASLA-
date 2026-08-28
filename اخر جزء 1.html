@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MØA | Wear Your Idea - Custom Apparel Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --bg-card: #14151a;
+            --bg-lighter: #1e2029;
+            --accent-pink: #ff6b8b;
+            --accent-pink-hover: #e05574;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a5b5;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; scroll-behavior: smooth; }
+        body { background-color: var(--bg-dark); color: var(--text-primary); overflow-x: hidden; position: relative; }
+
+        /* 3D Canvas Background */
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+
+        /* Navigation Bar */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 8%;
+            background: rgba(10, 10, 12, 0.85); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 4px; color: #fff; text-decoration: none; }
+        .logo span { color: var(--accent-pink); text-shadow: 0 0 12px rgba(255, 107, 139, 0.6); }
+
+        .nav-links { display: flex; list-style: none; gap: 35px; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; transition: var(--transition); }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent-pink); }
+
+        .nav-actions { display: flex; align-items: center; gap: 20px; }
+        .cart-trigger-btn {
+            background: var(--bg-lighter); border: 1px solid var(--border-color); color: #fff;
+            padding: 10px 18px; border-radius: 30px; cursor: pointer; font-size: 14px;
+            display: flex; align-items: center; gap: 8px; transition: var(--transition);
+        }
+        .cart-trigger-btn:hover { border-color: var(--accent-pink); color: var(--accent-pink); }
+        .cart-badge { background-color: var(--accent-pink); color: #fff; font-weight: 700; font-size: 11px; padding: 2px 7px; border-radius: 50%; }
+
+        .social-icons { display: flex; gap: 16px; align-items: center; }
+        .social-icons a { color: var(--text-secondary); font-size: 16px; transition: var(--transition); }
+        .social-icons a:hover { color: var(--accent-pink); transform: translateY(-2px); }
+        .menu-toggle { display: none; font-size: 22px; color: #fff; cursor: pointer; }
+
+        /* Hero Section */
+        .hero {
+            position: relative; width: 100%; min-height: calc(100vh - 80px);
+            display: flex; flex-direction: column; justify-content: space-between; z-index: 2;
+            background: linear-gradient(to right, rgba(13, 13, 13, 0.85) 30%, rgba(13, 13, 13, 0.3)), url('الخلفيه.png') no-repeat center center/cover;
+        }
+        .hero-body { display: flex; align-items: center; justify-content: space-between; padding: 40px 8%; flex: 1; gap: 40px; }
+        .hero-content { max-width: 580px; z-index: 2; }
+        .tagline-sub { font-size: 12px; letter-spacing: 4px; color: var(--accent-pink); text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        .tagline-sub::before { content: ''; width: 25px; height: 2px; background-color: var(--accent-pink); }
+        .hero-title { font-size: 62px; font-weight: 900; line-height: 1.05; letter-spacing: 1px; margin-bottom: 22px; }
+        .hero-title span { color: var(--accent-pink); }
+        .hero-description { color: var(--text-secondary); font-size: 14px; letter-spacing: 1.5px; line-height: 1.7; margin-bottom: 35px; text-transform: uppercase; font-weight: 500; }
+
+        .cta-buttons { display: flex; gap: 20px; flex-wrap: wrap; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-pink), #e05574); color: #fff; padding: 15px 32px;
+            border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px; letter-spacing: 1px;
+            display: flex; align-items: center; gap: 10px; transition: var(--transition); cursor: pointer; border: none;
+            box-shadow: 0 8px 25px rgba(255, 107, 139, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255, 107, 139, 0.5); }
+        .btn-secondary { border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 15px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px; letter-spacing: 1px; transition: var(--transition); background: rgba(255, 255, 255, 0.03); }
+        .btn-secondary:hover { border-color: #fff; background: rgba(255, 255, 255, 0.1); }
+
+        .mannequin-wrapper { position: relative; display: flex; justify-content: center; align-items: center; z-index: 2; flex: 1; }
+        .mannequin-img { max-height: 65vh; width: auto; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(255, 107, 139, 0.25); animation: float 4s ease-in-out infinite; }
+
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-18px); } 100% { transform: translateY(0px); } }
+
+        /* Features Bar */
+        .features-bar { display: flex; justify-content: space-between; background: rgba(15, 16, 22, 0.9); backdrop-filter: blur(15px); padding: 25px 8%; border-top: 1px solid var(--border-color); z-index: 10; position: relative; gap: 20px; }
+        .feature-item { display: flex; align-items: center; gap: 15px; }
+        .feature-item i { font-size: 20px; color: var(--accent-pink); background: rgba(255, 107, 139, 0.1); border: 1px solid rgba(255, 107, 139, 0.3); padding: 12px; border-radius: 10px; }
+        .feature-text h4 { font-size: 12px; letter-spacing: 1.5px; font-weight: 700; text-transform: uppercase; }
+        .feature-text p { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+
+        /* Interactive Studio Section */
+        .designer-section { position: relative; z-index: 2; padding: 100px 8%; background: rgba(10, 10, 12, 0.98); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; }
+        .section-title { text-align: center; margin-bottom: 30px; }
+        .section-title h2 { font-size: 38px; font-weight: 800; letter-spacing: 2px; }
+        .section-title h2 span { color: var(--accent-pink); }
+        .section-title p { color: var(--text-secondary); font-size: 13px; margin-top: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+
+        /* Studio Navigation Tabs */
+        .studio-tabs { display: flex; gap: 15px; margin-bottom: 30px; }
+        .studio-tab-btn {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-secondary);
+            padding: 12px 28px; border-radius: 30px; font-size: 13px; font-weight: 700; letter-spacing: 1.5px;
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px;
+        }
+        .studio-tab-btn:hover, .studio-tab-btn.active {
+            background: var(--accent-pink); color: #fff; border-color: var(--accent-pink);
+            box-shadow: 0 4px 20px rgba(255, 107, 139, 0.4);
+        }
+
+        .tab-content { display: none; width: 100%; max-width: 1200px; }
+        .tab-content.active { display: flex; }
+
+        .studio-container { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 40px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 40px; backdrop-filter: blur(10px); }
+
+        .studio-preview { flex: 1.2; position: relative; display: flex; justify-content: center; align-items: center; min-height: 480px; background: radial-gradient(circle, rgba(255,107,139,0.12) 0%, rgba(0,0,0,0) 70%); border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden; }
+        
+        .studio-view-toggle { position: absolute; top: 15px; left: 15px; display: flex; gap: 6px; z-index: 10; background: rgba(10, 10, 12, 0.7); padding: 4px; border-radius: 20px; border: 1px solid var(--border-color); }
+        .view-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 10px; font-weight: 700; padding: 6px 12px; border-radius: 15px; cursor: pointer; transition: var(--transition); }
+        .view-btn.active, .view-btn:hover { background: var(--accent-pink); color: #fff; }
+
+        .base-mannequin { height: 420px; width: auto; position: relative; z-index: 1; border-radius: 8px; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.7)); transition: var(--transition); }
+        .tshirt-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); height: 420px; width: auto; z-index: 2; opacity: 0; transition: all 0.4s ease-in-out; pointer-events: none; }
+        .tshirt-overlay.active { opacity: 1; }
+
+        /* Dynamic Text Display on Mannequin */
+        .live-text-overlay { position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%); z-index: 3; font-weight: 900; font-size: 18px; color: var(--accent-pink); letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 2px 8px rgba(0,0,0,0.8); pointer-events: none; text-align: center; width: 80%; }
+
+        .studio-controls { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .studio-controls h3 { font-size: 18px; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+        
+        .control-block { display: flex; flex-direction: column; gap: 10px; }
+        .control-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--text-secondary); text-transform: uppercase; }
+
+        .designs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-height: 280px; overflow-y: auto; padding-right: 5px; }
+        .design-card { background: var(--bg-lighter); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .design-card:hover, .design-card.selected { border-color: var(--accent-pink); background: rgba(255, 107, 139, 0.15); transform: translateY(-3px); }
+        .design-card img { width: 65px; height: 65px; object-fit: cover; border-radius: 6px; }
+        .design-card p { font-size: 11px; font-weight: 600; color: #ddd; }
+
+        .design-card-preview { width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; }
+
+        .color-palette { display: flex; gap: 12px; }
+        .color-swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: var(--transition); }
+        .color-swatch.selected, .color-swatch:hover { transform: scale(1.15); border-color: var(--accent-pink); box-shadow: 0 0 12px rgba(255, 107, 139, 0.4); }
+
+        .custom-text-input { width: 100%; background: var(--bg-lighter); border: 1px solid var(--border-color); color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 13px; outline: none; transition: var(--transition); }
+        .custom-text-input:focus { border-color: var(--accent-pink); }
+
+        .text-color-row { display: flex; align-items: center; gap: 10px; }
+        .text-color-swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: var(--transition); }
+        .text-color-swatch.active, .text-color-swatch:hover { border-color: #fff; transform: scale(1.15); }
+
+        .sizes-row { display: flex; gap: 10px; }
+        .size-btn { flex: 1; background: var(--bg-lighter); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 10px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; transition: var(--transition); }
+        .size-btn:hover, .size-btn.active { background: var(--accent-pink); color: #fff; border-color: var(--accent-pink); }
+
+        /* Collection Grid Section */
+        .collection-section { padding: 100px 8%; position: relative; z-index: 2; }
+        .filter-tags { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+        .tag-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 10px 22px; border-radius: 30px; font-size: 12px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: var(--transition); }
+        .tag-btn:hover, .tag-btn.active { background: var(--accent-pink); color: #fff; border-color: var(--accent-pink); box-shadow: 0 4px 15px rgba(255, 107, 139, 0.3); }
+
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; width: 100%; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); position: relative; display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-8px); border-color: rgba(255, 107, 139, 0.4); box-shadow: 0 15px 30px rgba(0,0,0,0.6); }
+        .product-thumb { height: 320px; background: #0f1016; display: flex; align-items: center; justify-content: center; padding: 15px; position: relative; overflow: hidden; }
+        .product-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; transition: var(--transition); }
+        .product-card:hover .product-thumb img { transform: scale(1.04); }
+        .product-badge { position: absolute; top: 15px; left: 15px; background: var(--accent-pink); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; z-index: 2; }
+        .product-info { padding: 20px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+        .product-cat { color: var(--accent-pink); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .product-name { font-size: 16px; font-weight: 700; color: #fff; }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 12px; border-top: 1px solid var(--border-color); }
+        .product-price { font-size: 18px; font-weight: 800; color: #fff; }
+        .add-cart-btn { background: var(--bg-lighter); border: 1px solid var(--border-color); color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        .add-cart-btn:hover { background: var(--accent-pink); border-color: var(--accent-pink); }
+
+        /* Cart Drawer Slide-out */
+        .cart-drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; opacity: 0; pointer-events: none; transition: var(--transition); }
+        .cart-drawer-overlay.open { opacity: 1; pointer-events: auto; }
+        .cart-drawer { position: fixed; top: 0; right: -420px; width: 100%; max-width: 420px; height: 100vh; background: var(--bg-card); border-left: 1px solid var(--border-color); z-index: 1001; display: flex; flex-direction: column; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 30px; }
+        .cart-drawer-overlay.open .cart-drawer { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .close-cart-btn { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; }
+        .cart-items-list { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; gap: 15px; }
+        .cart-item { display: flex; gap: 15px; background: var(--bg-lighter); padding: 12px; border-radius: 10px; align-items: center; border: 1px solid var(--border-color); }
+        .cart-item-info h4 { font-size: 13px; font-weight: 700; }
+        .cart-item-info p { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+        .cart-footer { border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .cart-total-row { display: flex; justify-content: space-between; font-weight: 800; font-size: 16px; }
+
+        /* Toast Popup Notification */
+        .toast { position: fixed; bottom: 30px; left: 30px; background: var(--accent-pink); color: #fff; padding: 14px 24px; border-radius: 30px; font-weight: 700; font-size: 13px; box-shadow: 0 10px 25px rgba(255, 107, 139, 0.4); display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: var(--transition); z-index: 2000; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        footer { text-align: center; padding: 40px 8%; border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 12px; letter-spacing: 1px; position: relative; z-index: 2; }
+
+        @media (max-width: 992px) {
+            .hero-body { flex-direction: column; text-align: center; }
+            .tagline-sub, .cta-buttons { justify-content: center; }
+            .hero-title { font-size: 42px; }
+            .mannequin-img { max-height: 45vh; margin-top: 30px; }
+            .menu-toggle { display: block; }
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(10, 10, 12, 0.98); padding: 20px 0; text-align: center; border-bottom: 1px solid var(--border-color); }
+            .nav-links.active { display: flex; }
+            .studio-container { flex-direction: column; padding: 20px; }
+            .features-bar { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Header Navigation Bar -->
+    <header>
+        <nav class="navbar">
+            <a href="#" class="logo">M<span>Ø</span>A</a>
+            
+            <i class="fas fa-bars menu-toggle" id="menuToggle"></i>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#designer" class="active">DESIGN STUDIO</a></li>
+                <li><a href="#collection">COLLECTION</a></li>
+                <li><a href="#how-it-works">HOW IT WORKS</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <div class="social-icons">
+                    <a href="https://wa.me/201278956222" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.facebook.com/share/18fPgT73Zt/" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://instagram.com" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://x.com" target="_blank" title="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+                    <a href="https://tiktok.com" target="_blank" title="TikTok"><i class="fab fa-tiktok"></i></a>
+                </div>
+
+                <button class="cart-trigger-btn" onclick="toggleCartDrawer()">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartBadgeCount">0</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-body">
+            <div class="hero-content">
+                <div class="tagline-sub">WELCOME TO MØA APPAREL</div>
+                <h1 class="hero-title">WEAR<br>YOUR<br><span>IDEA.</span></h1>
+                <p class="hero-description">CREATE WHAT YOU IMAGINE.<br>WE PRINT IT. YOU WEAR IT.</p>
+                <div class="cta-buttons">
+                    <a href="#designer" class="btn-primary">START DESIGNING <i class="fas fa-arrow-right"></i></a>
+                    <a href="#collection" class="btn-secondary">SHOP COLLECTION</a>
+                </div>
+            </div>
+
+            <div class="mannequin-wrapper">
+                <img src="الخلفيه.png" alt="MØA Mannequin" class="mannequin-img">
+            </div>
+        </div>
+
+        <div class="features-bar">
+            <div class="feature-item">
+                <i class="fas fa-pen-nib"></i>
+                <div class="feature-text"><h4>YOUR DESIGN</h4><p>Create anything you can imagine.</p></div>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-layer-group"></i>
+                <div class="feature-text"><h4>PREMIUM QUALITY</h4><p>High quality fabrics that last long.</p></div>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-print"></i>
+                <div class="feature-text"><h4>PERFECT PRINT</h4><p>Sharp details, vibrant colors.</p></div>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-truck"></i>
+                <div class="feature-text"><h4>FAST DELIVERY</h4><p>Delivered to your door, anywhere.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Design Studio Section -->
+    <section class="designer-section" id="designer">
+        <div class="section-title">
+            <h2>DESIGN <span>STUDIO</span></h2>
+            <p>CHOOSE A STYLE, FABRIC COLOR & TEXT TO DRESS THE MODEL</p>
+        </div>
+
+        <!-- Studio Mode Tabs -->
+        <div class="studio-tabs">
+            <button class="studio-tab-btn active" onclick="switchStudioTab('modelTab', this)">
+                <i class="fas fa-user-astronaut"></i> MODEL VIEW
+            </button>
+            <button class="studio-tab-btn" onclick="switchStudioTab('designTab', this)">
+                <i class="fas fa-palette"></i> DESIGN
+            </button>
+        </div>
+
+        <!-- TAB 1: Model View -->
+        <div class="tab-content active" id="modelTab">
+            <div class="studio-container">
+                <!-- Left Side: Interactive Model -->
+                <div class="studio-preview">
+                    <!-- Front / Back Toggle Badge -->
+                    <div class="studio-view-toggle">
+                        <button class="view-btn active" id="viewFrontBtn" onclick="switchView('front')"><i class="fas fa-redo"></i> FRONT</button>
+                        <button class="view-btn" id="viewBackBtn" onclick="switchView('back')"><i class="fas fa-undo"></i> BACK</button>
+                    </div>
+
+                    <!-- المانيكان الأساسي -->
+                    <img src="الخلفيه.png" alt="Model Body" class="base-mannequin" id="mannequinBase">
+                    
+                    <!-- الطبقة التي يظهر عليها التيشرت المحدد -->
+                    <img src="a25ebccb-039e-42fd-a0d1-a37e0f901171-562.5x1000-pw9RZzoqjzSf1pUU3tAvmR43fXN24D94IOO6FuO8.webp" id="tshirtOverlay" class="tshirt-overlay active" alt="Applied Shirt">
+
+                    <!-- النص التفاعلي المباشر فوق المانيكان -->
+                    <div class="live-text-overlay" id="liveTextOverlay"></div>
+                </div>
+
+                <!-- Right Side: Interactive Controls -->
+                <div class="studio-controls">
+                    <h3><i class="fas fa-sliders-h" style="color: var(--accent-pink);"></i> Customizer Controls</h3>
+
+                    <!-- Select Print Design -->
+                    <div class="control-block">
+                        <span class="control-label">1. Select Print Style:</span>
+                        <div class="designs-grid">
+                            <div class="design-card selected" onclick="applyShirt('a25ebccb-039e-42fd-a0d1-a37e0f901171-562.5x1000-pw9RZzoqjzSf1pUU3tAvmR43fXN24D94IOO6FuO8.webp', 'Scout Freedom', this)">
+                                <img src="a25ebccb-039e-42fd-a0d1-a37e0f901171-562.5x1000-pw9RZzoqjzSf1pUU3tAvmR43fXN24D94IOO6FuO8.webp" alt="AOT Wings">
+                                <p>Scout Freedom (AOT)</p>
+                            </div>
+                            <div class="design-card" onclick="applyShirt('images (2).jpg', 'To The One Left It All', this)">
+                                <img src="images (2).jpg" alt="JJK Toji Tee">
+                                <p>Toji Left It All</p>
+                            </div>
+                            <div class="design-card" onclick="applyShirt('images (1).jpg', 'Minimalist Lion', this)">
+                                <img src="images (1).jpg" alt="Lion Minimal Tee">
+                                <p>Minimalist Lion</p>
+                            </div>
+                            <div class="design-card" onclick="applyShirt('images.jpg', 'Neon Ghost Power', this)">
+                                <img src="images.jpg" alt="Neon Ghost Power">
+                                <p>Neon Ghost Power</p>
+                            </div>
+                            <div class="design-card" onclick="applyShirt('576283.jpg', 'Halloween Castle', this)">
+                                <img src="576283.jpg" alt="Halloween Castle">
+                                <p>Halloween Castle</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Select Fabric Color Hue Filter -->
+                    <div class="control-block">
+                        <span class="control-label">2. Select Fabric Tint/Color:</span>
+                        <div class="color-palette">
+                            <div class="color-swatch selected" style="background-color: #14161f;" onclick="setFabricTint('none', this)" title="Original"></div>
+                            <div class="color-swatch" style="background-color: #ff6b8b;" onclick="setFabricTint('hue-rotate(320deg) contrast(1.2)', this)" title="Pink Tint"></div>
+                            <div class="color-swatch" style="background-color: #2b382b;" onclick="setFabricTint('hue-rotate(90deg) brightness(0.7)', this)" title="Tactical Green"></div>
+                            <div class="color-swatch" style="background-color: #4a1525;" onclick="setFabricTint('hue-rotate(350deg) brightness(0.6)', this)" title="Crimson Red"></div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Text Input -->
+                    <div class="control-block">
+                        <span class="control-label">3. Add Custom Text Print:</span>
+                        <input type="text" class="custom-text-input" placeholder="Type custom text (e.g., MØA CREW)..." oninput="updateLiveText(this.value)">
+                        <div class="text-color-row" style="margin-top: 5px;">
+                            <span style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">Text Color:</span>
+                            <div class="text-color-swatch active" style="background-color: #ff6b8b;" onclick="setTextColor('#ff6b8b', this)"></div>
+                            <div class="text-color-swatch" style="background-color: #ffffff;" onclick="setTextColor('#ffffff', this)"></div>
+                            <div class="text-color-swatch" style="background-color: #00f0ff;" onclick="setTextColor('#00f0ff', this)"></div>
+                            <div class="text-color-swatch" style="background-color: #ffe259;" onclick="setTextColor('#ffe259', this)"></div>
+                        </div>
+                    </div>
+
+                    <!-- Select Size -->
+                    <div class="control-block">
+                        <span class="control-label">4. Select Size:</span>
+                        <div class="sizes-row">
+                            <button class="size-btn" onclick="setSize('S', this)">S</button>
+                            <button class="size-btn" onclick="setSize('M', this)">M</button>
+                            <button class="size-btn active" onclick="setSize('L', this)">L</button>
+                            <button class="size-btn" onclick="setSize('XL', this)">XL</button>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="addCustomToCart()">
+                        <i class="fas fa-cart-plus"></i> ADD CUSTOM SHIRT ($39.99)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: DESIGN -->
+        <div class="tab-content" id="designTab">
+            <div class="studio-container">
+                <!-- Left Side: Interactive SVG Model View -->
+                <div class="studio-preview">
+                    <!-- Front / Back Toggle Badge -->
+                    <div class="studio-view-toggle">
+                        <button class="view-btn active" id="viewSvgFrontBtn" onclick="switchSvgView('front')"><i class="fas fa-redo"></i> FRONT</button>
+                        <button class="view-btn" id="viewSvgBackBtn" onclick="switchSvgView('back')"><i class="fas fa-undo"></i> BACK</button>
+                    </div>
+
+                    <svg id="studioMannequinSvg" viewBox="0 0 300 420" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="fabricHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
+                                <stop offset="50%" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="100%" stop-color="#000000" stop-opacity="0.45"/>
+                            </linearGradient>
+                            <linearGradient id="woodStandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#2d221e"/>
+                                <stop offset="50%" stop-color="#5c443b"/>
+                                <stop offset="100%" stop-color="#1e1614"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Base Wooden Stand & Floor Shadow -->
+                        <ellipse cx="150" cy="405" rx="75" ry="12" fill="#000000" opacity="0.6"/>
+                        <ellipse cx="150" cy="400" rx="65" ry="12" fill="url(#woodStandGrad)"/>
+                        <rect x="145" y="325" width="10" height="78" fill="url(#woodStandGrad)"/>
+                        
+                        <!-- Neck Pole Joint with Chrome Accent -->
+                        <rect x="141" y="40" width="18" height="38" rx="3" fill="#8d99ae"/>
+                        <rect x="143" y="42" width="14" height="6" rx="2" fill="#e2e8f0"/>
+
+                        <!-- Main Dynamic Shirt Graphic -->
+                        <g id="interactiveShirt">
+                            <!-- T-Shirt Body Base Path -->
+                            <path id="shirtBodyPath" d="M 90 65 L 120 78 C 135 84 165 84 180 78 L 210 65 L 275 120 L 240 165 L 220 148 L 220 330 C 220 336 214 340 206 340 L 94 340 C 86 340 80 336 80 330 L 80 148 L 60 165 L 25 120 Z" fill="#14161f" stroke="#2c3040" stroke-width="2.5"/>
+                            
+                            <!-- Sleeve Seam & Wrinkle Depth Details -->
+                            <path d="M 90 65 L 80 148 M 210 65 L 220 148" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+                            <path d="M 82 130 C 100 140 110 135 120 145" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" fill="none"/>
+                            <path d="M 218 130 C 200 140 190 135 180 145" stroke="rgba(0,0,0,0.15)" stroke-width="1.5" fill="none"/>
+
+                            <!-- Dynamic Highlight Overlay for 3D Fabric Depth -->
+                            <path id="shirtHighlightOverlay" d="M 90 65 L 120 78 C 135 84 165 84 180 78 L 210 65 L 275 120 L 240 165 L 220 148 L 220 330 C 220 336 214 340 206 340 L 94 340 C 86 340 80 336 80 330 L 80 148 L 60 165 L 25 120 Z" fill="url(#fabricHighlight)"/>
+
+                            <!-- Collar Trim & Stitching -->
+                            <path id="shirtCollarPath" d="M 120 78 C 135 94 165 94 180 78" stroke="#2c3040" stroke-width="3" fill="none"/>
+                            <path id="shirtInnerCollar" d="M 120 78 C 135 68 165 68 180 78 L 180 75 C 165 62 135 62 120 75 Z" fill="#0d0e12" opacity="0.7"/>
+
+                            <!-- Dynamic Print Overlay Group -->
+                            <g id="printOverlayGroup" transform="translate(100, 110)">
+                                <!-- Scout Wings Graphic Preset -->
+                                <g id="graphicAot" opacity="1">
+                                    <rect x="10" y="10" width="80" height="100" rx="6" fill="none" stroke="#ffffff" stroke-width="3.5"/>
+                                    <line x1="50" y1="10" x2="50" y2="110" stroke="#ffffff" stroke-width="2.5"/>
+                                    <g fill="#181a20" stroke="#ffffff" stroke-width="1.8">
+                                        <path d="M 45 18 C 30 23 15 42 18 62 C 22 72 35 82 45 88 C 38 76 28 62 35 45 Z"/>
+                                        <path d="M 45 32 C 28 42 22 60 28 75 C 35 82 40 66 45 56 Z"/>
+                                    </g>
+                                    <g fill="#ffffff" stroke="#101216" stroke-width="1.8">
+                                        <path d="M 55 18 C 70 23 85 42 82 62 C 78 72 65 82 55 88 C 62 76 72 62 65 45 Z"/>
+                                        <path d="M 55 32 C 72 42 78 60 72 75 C 65 82 60 66 55 56 Z"/>
+                                    </g>
+                                </g>
+
+                                <!-- Cyberpunk Neon Graphic Preset -->
+                                <g id="graphicCyber" opacity="0">
+                                    <circle cx="50" cy="55" r="42" fill="none" stroke="#ff6b8b" stroke-width="3.5"/>
+                                    <circle cx="50" cy="55" r="32" fill="none" stroke="#00f0ff" stroke-width="1.5" stroke-dasharray="6, 3"/>
+                                    <path d="M 20 55 L 80 55 M 50 25 L 50 85" stroke="#00f0ff" stroke-width="2"/>
+                                    <polygon points="50,18 82,78 18,78" fill="none" stroke="#ff6b8b" stroke-width="2.5"/>
+                                    <text x="50" y="60" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="10" fill="#00f0ff" text-anchor="middle" letter-spacing="3">2077</text>
+                                </g>
+
+                                <!-- Urban Oversized Graphic Preset -->
+                                <g id="graphicUrban" opacity="0">
+                                    <text x="50" y="38" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="22" fill="#ffffff" text-anchor="middle">東京</text>
+                                    <text x="50" y="60" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="14" fill="#ff6b8b" text-anchor="middle" letter-spacing="2">TOKYO</text>
+                                    <text x="50" y="76" font-family="'Montserrat', sans-serif" font-weight="700" font-size="9" fill="#a0a5b5" text-anchor="middle" letter-spacing="1">STREETWEAR DIVISION</text>
+                                    <rect x="20" y="86" width="60" height="3" fill="#ffffff"/>
+                                </g>
+
+                                <!-- Minimalist Line Art Preset -->
+                                <g id="graphicMinimal" opacity="0">
+                                    <path d="M 25 30 C 40 10 60 10 75 30 C 90 60 50 90 50 90 C 50 90 10 60 25 30 Z" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+                                    <circle cx="50" cy="45" r="14" fill="#ff6b8b" opacity="0.8"/>
+                                    <path d="M 38 45 Q 50 60 62 45" stroke="#ffffff" stroke-width="2" fill="none"/>
+                                </g>
+                            </g>
+
+                            <!-- Dynamic Live Text Overlay -->
+                            <text id="liveTextSvg" x="150" y="275" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="15" fill="#ff6b8b" text-anchor="middle" letter-spacing="2"></text>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Right Side: Interactive Vector Controls -->
+                <div class="studio-controls">
+                    <h3><i class="fas fa-sliders-h" style="color: var(--accent-pink);"></i> SVG Vector Customizer</h3>
+
+                    <!-- Select Design Preset -->
+                    <div class="control-block">
+                        <span class="control-label">1. Choose Vector Preset:</span>
+                        <div class="designs-grid">
+                            <div class="design-card selected" onclick="selectSvgDesign('Aot', this)">
+                                <div class="design-card-preview">
+                                    <svg viewBox="0 0 60 60" width="45" height="45">
+                                        <rect x="5" y="5" width="50" height="50" rx="4" fill="none" stroke="#ff6b8b" stroke-width="2"/>
+                                        <path d="M 20 20 L 40 40 M 40 20 L 20 40" stroke="#ffffff" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <p>Scout Freedom</p>
+                            </div>
+
+                            <div class="design-card" onclick="selectSvgDesign('Cyber', this)">
+                                <div class="design-card-preview">
+                                    <svg viewBox="0 0 60 60" width="45" height="45">
+                                        <circle cx="30" cy="30" r="20" fill="none" stroke="#00f0ff" stroke-width="2"/>
+                                        <polygon points="30,15 42,40 18,40" fill="none" stroke="#ff6b8b" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <p>Cyberpunk Neon</p>
+                            </div>
+
+                            <div class="design-card" onclick="selectSvgDesign('Urban', this)">
+                                <div class="design-card-preview">
+                                    <svg viewBox="0 0 60 60" width="45" height="45">
+                                        <text x="30" y="32" font-weight="900" font-size="12" fill="#fff" text-anchor="middle">URBAN</text>
+                                        <rect x="15" y="38" width="30" height="3" fill="#ff6b8b"/>
+                                    </svg>
+                                </div>
+                                <p>Urban Oversized</p>
+                            </div>
+
+                            <div class="design-card" onclick="selectSvgDesign('Minimal', this)">
+                                <div class="design-card-preview">
+                                    <svg viewBox="0 0 60 60" width="45" height="45">
+                                        <path d="M 20 25 C 30 10 40 10 40 25 C 50 40 30 50 30 50 C 30 50 10 40 20 25 Z" fill="none" stroke="#ffffff" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <p>Minimal Line</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Select Fabric Color -->
+                    <div class="control-block">
+                        <span class="control-label">2. Select Solid Fabric Color:</span>
+                        <div class="color-palette">
+                            <div class="color-swatch selected" style="background-color: #14161f;" onclick="setSvgFabricColor('#14161f', '#2c3040', this)" title="Obsidian Black"></div>
+                            <div class="color-swatch" style="background-color: #2b382b;" onclick="setSvgFabricColor('#2b382b', '#3e503e', this)" title="Tactical Olive"></div>
+                            <div class="color-swatch" style="background-color: #e2e8f0;" onclick="setSvgFabricColor('#e2e8f0', '#cbd5e1', this)" title="Pure White"></div>
+                            <div class="color-swatch" style="background-color: #4a1525;" onclick="setSvgFabricColor('#4a1525', '#6b2137', this)" title="Crimson Red"></div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Text Input -->
+                    <div class="control-block">
+                        <span class="control-label">3. Add Vector Text Print:</span>
+                        <input type="text" class="custom-text-input" placeholder="Type text for SVG model..." oninput="updateSvgLiveText(this.value)">
+                        <div class="text-color-row" style="margin-top: 5px;">
+                            <span style="font-size: 10px; color: var(--text-secondary); font-weight: 700;">Text Color:</span>
+                            <div class="text-color-swatch active" style="background-color: #ff6b8b;" onclick="setSvgTextColor('#ff6b8b', this)"></div>
+                            <div class="text-color-swatch" style="background-color: #ffffff;" onclick="setSvgTextColor('#ffffff', this)"></div>
+                            <div class="text-color-swatch" style="background-color: #00f0ff;" onclick="setSvgTextColor('#00f0ff', this)"></div>
+                            <div class="text-color-swatch" style="background-color: #ffe259;" onclick="setSvgTextColor('#ffe259', this)"></div>
+                        </div>
+                    </div>
+
+                    <!-- Select Size -->
+                    <div class="control-block">
+                        <span class="control-label">4. Select Size:</span>
+                        <div class="sizes-row">
+                            <button class="size-btn" onclick="setSize('S', this)">S</button>
+                            <button class="size-btn" onclick="setSize('M', this)">M</button>
+                            <button class="size-btn active" onclick="setSize('L', this)">L</button>
+                            <button class="size-btn" onclick="setSize('XL', this)">XL</button>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="addCustomToCart()">
+                        <i class="fas fa-cart-plus"></i> ADD VECTOR SHIRT ($39.99)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ready-to-Wear Collection Section -->
+    <section class="collection-section" id="collection">
+        <div class="section-title">
+            <h2>FLAGSHIP <span>COLLECTION</span></h2>
+            <p>EXPLORE OUR EXCLUSIVE APPAREL DROPS</p>
+        </div>
+
+        <div class="filter-tags">
+            <button class="tag-btn active" onclick="filterCollection('all', this)">ALL ITEMS</button>
+            <button class="tag-btn" onclick="filterCollection('gym', this)">GYM & ACTIVEWEAR</button>
+            <button class="tag-btn" onclick="filterCollection('streetwear', this)">STREETWEAR</button>
+            <button class="tag-btn" onclick="filterCollection('essentials', this)">ESSENTIALS</button>
+            <button class="tag-btn" onclick="filterCollection('summer', this)">SUMMER DROP</button>
+        </div>
+
+        <div class="products-grid">
+            <!-- Product 1: Gym Line Chapter 01 Pressure -->
+            <div class="product-card" data-category="gym">
+                <span class="product-badge">BESTSELLER</span>
+                <div class="product-thumb">
+                    <img src="gym_pressure_tee.png" alt="Ø.ESSENCE Performance Tee">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Gym Line Chapter 01</span>
+                    <h3 class="product-name">Ø.ESSENCE Pressure Performance Tee</h3>
+                    <div class="product-footer">
+                        <span class="product-price">$38.00</span>
+                        <button class="add-cart-btn" onclick="addToCart('Ø.ESSENCE Pressure Performance Tee', 38.00)">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 2: String Theory Tee -->
+            <div class="product-card" data-category="streetwear">
+                <span class="product-badge">NEW DROP</span>
+                <div class="product-thumb">
+                    <img src="string_theory_tee.png" alt="The String Theory Tee">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">MØA Concept Series</span>
+                    <h3 class="product-name">The String Theory Oversized Tee</h3>
+                    <div class="product-footer">
+                        <span class="product-price">$48.00</span>
+                        <button class="add-cart-btn" onclick="addToCart('The String Theory Oversized Tee', 48.00)">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 3: Boxer Collection -->
+            <div class="product-card" data-category="essentials">
+                <div class="product-thumb">
+                    <img src="boxers_collection.png" alt="MØA Premium Boxers">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Underwear Line</span>
+                    <h3 class="product-name">MØA Contour Pouch Boxers (4-Pack)</h3>
+                    <div class="product-footer">
+                        <span class="product-price">$32.00</span>
+                        <button class="add-cart-btn" onclick="addToCart('MØA Contour Pouch Boxers', 32.00)">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 4: Mesh Shirt Line -->
+            <div class="product-card" data-category="summer">
+                <span class="product-badge">EXCLUSIVE</span>
+                <div class="product-thumb">
+                    <img src="mesh_shirt_line.png" alt="Mesh Shirt Line">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Summer Collection '26</span>
+                    <h3 class="product-name">MØA Embroidered Mesh Shirt</h3>
+                    <div class="product-footer">
+                        <span class="product-price">$54.00</span>
+                        <button class="add-cart-btn" onclick="addToCart('MØA Embroidered Mesh Shirt', 54.00)">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 5: Socks Series Crew -->
+            <div class="product-card" data-category="essentials">
+                <div class="product-thumb">
+                    <img src="socks_series_crew.png" alt="Ø.ESSENCE Ribbed Socks">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Socks Series</span>
+                    <h3 class="product-name">Ø.ESSENCE Ribbed Everyday Crew Socks</h3>
+                    <div class="product-footer">
+                        <span class="product-price">$18.00</span>
+                        <button class="add-cart-btn" onclick="addToCart('Ø.ESSENCE Ribbed Everyday Crew Socks', 18.00)">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 6: Sweat Series -->
+            <div class="product-card" data-category="streetwear">
+                <span class="product-badge">HEAVYWEIGHT</span>
+                <div class="product-thumb">
+                    <img src="sweat_series.png" alt="Ø.ESSENCE Sweatpants">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Sweat Series</span>
+                    <h3 class="product-name">Ø.ESSENCE Heavyweight French Terry Sweatpants</h3>
+                    <div class="product-footer">
+                        <span class="product-price">$58.00</span>
+                        <button class="add-cart-btn" onclick="addToCart('Ø.ESSENCE Heavyweight Sweatpants', 58.00)">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 7: Invisible Socks -->
+            <div class="product-card" data-category="essentials">
+                <div class="product-thumb">
+                    <img src="invisible_socks.png" alt="Ø.ESSENCE Invisible Fit Socks">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Socks Series</span>
+                    <h3 class="product-name">Ø.ESSENCE Invisible Fit No-Show Socks</h3>
+                    <div class="product-footer">
+                        <span class="product-price">$16.00</span>
+                        <button class="add-cart-btn" onclick="addToCart('Ø.ESSENCE Invisible Fit Socks', 16.00)">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 8: Tank Top Collection -->
+            <div class="product-card" data-category="gym">
+                <div class="product-thumb">
+                    <img src="tank_top_collection.png" alt="MØA Athletic Fit Tank Top">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tank Top Line '26</span>
+                    <h3 class="product-name">MØA Athletic Fit Cotton Tank Top</h3>
+                    <div class="product-footer">
+                        <span class="product-price">$29.00</span>
+                        <button class="add-cart-btn" onclick="addToCart('MØA Athletic Fit Cotton Tank Top', 29.00)">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product 9: Black Button Up Shirt -->
+            <div class="product-card" data-category="streetwear">
+                <span class="product-badge">PREMIUM</span>
+                <div class="product-thumb">
+                    <img src="black_button_shirt.png" alt="MØA Signature Black Shirt">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Luxury Edition</span>
+                    <h3 class="product-name">MØA Signature Tailored Black Shirt</h3>
+                    <div class="product-footer">
+                        <span class="product-price">$62.00</span>
+                        <button class="add-cart-btn" onclick="addToCart('MØA Signature Tailored Black Shirt', 62.00)">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Drawer Modal -->
+    <div class="cart-drawer-overlay" id="cartOverlay" onclick="toggleCartDrawer()">
+        <div class="cart-drawer" onclick="event.stopPropagation()">
+            <div class="cart-header">
+                <h3>Your Shopping Cart</h3>
+                <button class="close-cart-btn" onclick="toggleCartDrawer()"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="cart-items-list" id="cartItemsContainer">
+                <!-- Cart items will be appended dynamically -->
+            </div>
+
+            <div class="cart-footer">
+                <div class="cart-total-row">
+                    <span>Total:</span>
+                    <span id="cartTotalPrice">$0.00</span>
+                </div>
+                <button class="btn-primary" style="justify-content: center; width: 100%;" onclick="checkoutOrder()">
+                    PROCEED TO CHECKOUT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Popup -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle" style="font-size: 18px;"></i>
+        <span id="toastText">Item added to cart!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 MØA APPAREL - WEAR YOUR IDEA | ALL RIGHTS RESERVED</p>
+    </footer>
+
+    <script>
+        // 3D Canvas Particles Background
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = Array.from({ length: 70 }, () => ({
+            x: (Math.random() - 0.5) * canvas.width,
+            y: (Math.random() - 0.5) * canvas.height,
+            z: Math.random() * canvas.width,
+            size: 1.8
+        }));
+
+        function animate3D() {
+            ctx.fillStyle = 'rgba(10, 10, 12, 0.25)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            particles.forEach(p => {
+                p.z -= 1.2;
+                if (p.z <= 0) p.z = canvas.width;
+
+                const k = 300 / p.z;
+                const px = p.x * k + cx;
+                const py = p.y * k + cy;
+
+                if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
+                    const alpha = (1 - p.z / canvas.width);
+                    ctx.fillStyle = `rgba(255, 107, 139, ${alpha * 0.8})`;
+                    ctx.beginPath();
+                    ctx.arc(px, py, p.size * k * 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            requestAnimationFrame(animate3D);
+        }
+        animate3D();
+
+        // Responsive Navigation
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Tab Switching Logic
+        function switchStudioTab(tabId, btnEl) {
+            document.querySelectorAll('.studio-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            btnEl.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // --- PART 1 JS CONTROLS ---
+        let selectedSize = 'L';
+        let selectedStyleName = 'Scout Freedom (AOT)';
+        let isBackView = false;
+        let cartItems = [];
+
+        function applyShirt(imageSrc, styleName, element) {
+            const overlay = document.getElementById('tshirtOverlay');
+            selectedStyleName = styleName;
+
+            document.querySelectorAll('#modelTab .design-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                overlay.src = imageSrc;
+                overlay.classList.add('active');
+            }, 200);
+        }
+
+        function switchView(view) {
+            isBackView = (view === 'back');
+            document.getElementById('viewFrontBtn').classList.toggle('active', !isBackView);
+            document.getElementById('viewBackBtn').classList.toggle('active', isBackView);
+
+            const overlay = document.getElementById('tshirtOverlay');
+            const liveText = document.getElementById('liveTextOverlay');
+
+            if (isBackView) {
+                overlay.style.transform = 'translate(-50%, -50%) scale(0.95)';
+                liveText.style.top = '45%';
+            } else {
+                overlay.style.transform = 'translate(-50%, -50%) scale(1)';
+                liveText.style.top = '60%';
+            }
+        }
+
+        function setFabricTint(filterVal, swatchEl) {
+            document.querySelectorAll('#modelTab .color-swatch').forEach(s => s.classList.remove('selected'));
+            swatchEl.classList.add('selected');
+            document.getElementById('tshirtOverlay').style.filter = filterVal;
+        }
+
+        function updateLiveText(val) {
+            document.getElementById('liveTextOverlay').textContent = val.toUpperCase();
+        }
+
+        function setTextColor(hex, swatchEl) {
+            document.querySelectorAll('#modelTab .text-color-swatch').forEach(s => s.classList.remove('active'));
+            swatchEl.classList.add('active');
+            document.getElementById('liveTextOverlay').style.color = hex;
+        }
+
+        function setSize(size, btnEl) {
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+            selectedSize = size;
+        }
+
+        // --- PART 2 SVG JS CONTROLS ---
+        function selectSvgDesign(type, cardEl) {
+            document.querySelectorAll('#designTab .design-card').forEach(c => c.classList.remove('selected'));
+            cardEl.classList.add('selected');
+
+            ['graphicAot', 'graphicCyber', 'graphicUrban', 'graphicMinimal'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.setAttribute('opacity', '0');
+            });
+
+            const target = document.getElementById('graphic' + type);
+            if(target) target.setAttribute('opacity', '1');
+        }
+
+        function setSvgFabricColor(bodyHex, strokeHex, swatchEl) {
+            document.querySelectorAll('#designTab .color-swatch').forEach(s => s.classList.remove('selected'));
+            swatchEl.classList.add('selected');
+
+            document.getElementById('shirtBodyPath').setAttribute('fill', bodyHex);
+            document.getElementById('shirtBodyPath').setAttribute('stroke', strokeHex);
+        }
+
+        function updateSvgLiveText(val) {
+            document.getElementById('liveTextSvg').textContent = val.toUpperCase();
+        }
+
+        function setSvgTextColor(hex, swatchEl) {
+            document.querySelectorAll('#designTab .text-color-swatch').forEach(s => s.classList.remove('active'));
+            swatchEl.classList.add('active');
+            document.getElementById('liveTextSvg').setAttribute('fill', hex);
+        }
+
+        function switchSvgView(view) {
+            const isBack = (view === 'back');
+            document.getElementById('viewSvgFrontBtn').classList.toggle('active', !isBack);
+            document.getElementById('viewSvgBackBtn').classList.toggle('active', isBack);
+
+            const overlayGroup = document.getElementById('printOverlayGroup');
+            const liveText = document.getElementById('liveTextSvg');
+
+            if(isBack) {
+                overlayGroup.setAttribute('transform', 'translate(100, 110) scale(0.85)');
+                liveText.setAttribute('y', '200');
+            } else {
+                overlayGroup.setAttribute('transform', 'translate(100, 110) scale(1)');
+                liveText.setAttribute('y', '275');
+            }
+        }
+
+        // Shopping Cart Logic
+        function toggleCartDrawer() {
+            document.getElementById('cartOverlay').classList.toggle('open');
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItemsContainer');
+            container.innerHTML = '';
+            let total = 0;
+
+            if (cartItems.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color: var(--text-secondary); margin-top:20px;">Your cart is empty.</p>`;
+            }
+
+            cartItems.forEach((item) => {
+                total += item.price * item.qty;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <i class="fas fa-tshirt" style="font-size: 22px; color: var(--accent-pink);"></i>
+                    <div class="cart-item-info" style="flex: 1;">
+                        <h4>${item.name}</h4>
+                        <p>Size: ${item.size} | Qty: ${item.qty}</p>
+                    </div>
+                    <span style="font-weight: 800;">$${(item.price * item.qty).toFixed(2)}</span>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('cartBadgeCount').innerText = cartItems.length;
+            document.getElementById('cartTotalPrice').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function addToCart(name, price) {
+            cartItems.push({ name, price, size: 'L', qty: 1 });
+            renderCart();
+            showToast(`Added "${name}" to cart!`);
+        }
+
+        function addCustomToCart() {
+            cartItems.push({ name: `Custom Shirt (${selectedStyleName})`, price: 39.99, size: selectedSize, qty: 1 });
+            renderCart();
+            showToast(`Custom shirt added to cart!`);
+            toggleCartDrawer();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastText').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function filterCollection(category, btnEl) {
+            document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+
+            document.querySelectorAll('.product-card').forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function checkoutOrder() {
+            if(cartItems.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+            const text = encodeURIComponent(`Hello MØA, I would like to place an order for ${cartItems.length} item(s). Total: ${document.getElementById('cartTotalPrice').innerText}`);
+            window.open(`https://wa.me/201278956222?text=${text}`, '_blank');
+        }
+    </script>
+</body>
+</html>

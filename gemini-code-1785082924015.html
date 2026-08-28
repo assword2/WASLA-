@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MØA | Wear Your Idea & Admin Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --bg-card: #14151a;
+            --bg-lighter: #1e2029;
+            --accent-pink: #ff6b8b;
+            --accent-pink-hover: #e05574;
+            --accent-green: #2ed573;
+            --accent-yellow: #ffa502;
+            --accent-red: #ff4757;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a5b5;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; scroll-behavior: smooth; }
+        body { background-color: var(--bg-dark); color: var(--text-primary); overflow-x: hidden; position: relative; min-height: 100vh; }
+
+        /* Background Canvas */
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+
+        /* Main Navigation */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center; padding: 15px 5%;
+            background: rgba(10, 10, 12, 0.95); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: 2px; color: #fff; text-decoration: none; }
+        .logo span { color: var(--accent-pink); text-shadow: 0 0 12px rgba(255, 107, 139, 0.6); }
+
+        .nav-tabs { display: flex; gap: 10px; background: var(--bg-card); padding: 5px; border-radius: 30px; border: 1px solid var(--border-color); }
+        .view-tab-btn {
+            background: transparent; border: none; color: var(--text-secondary); padding: 8px 18px;
+            border-radius: 20px; font-weight: 700; font-size: 13px; cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .view-tab-btn.active { background: var(--accent-pink); color: #fff; box-shadow: 0 4px 15px rgba(255, 107, 139, 0.4); }
+
+        .nav-actions { display: flex; align-items: center; gap: 10px; }
+        
+        .social-nav-btn {
+            background: var(--bg-lighter); border: 1px solid var(--border-color); color: #fff;
+            width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; text-decoration: none; font-size: 15px; transition: var(--transition);
+        }
+        .social-nav-btn:hover { border-color: var(--accent-pink); color: var(--accent-pink); transform: translateY(-2px); }
+
+        .cart-trigger-btn, .admin-secret-btn {
+            background: var(--bg-lighter); border: 1px solid var(--border-color); color: #fff;
+            padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 14px;
+            display: flex; align-items: center; gap: 8px; transition: var(--transition);
+        }
+        .cart-trigger-btn:hover, .admin-secret-btn:hover,
+        .cart-trigger-btn.active, .admin-secret-btn.active { border-color: var(--accent-pink); color: var(--accent-pink); }
+        .admin-secret-btn { padding: 8px 12px; border-radius: 50%; width: 36px; height: 36px; justify-content: center; }
+        .cart-badge { background-color: var(--accent-pink); color: #fff; font-weight: 700; font-size: 11px; padding: 2px 7px; border-radius: 50%; }
+
+        /* Views Container */
+        .app-view { display: none; position: relative; z-index: 2; }
+        .app-view.active { display: block; }
+
+        /* Hero Section */
+        .hero {
+            position: relative; width: 100%; min-height: calc(100vh - 80px);
+            display: flex; flex-direction: column; justify-content: space-between; z-index: 2;
+            background: linear-gradient(to right, rgba(13, 13, 13, 0.85) 30%, rgba(13, 13, 13, 0.3)), url('الخلفيه.png') no-repeat center center/cover;
+        }
+        .hero-body { display: flex; align-items: center; justify-content: space-between; padding: 40px 8%; flex: 1; gap: 40px; }
+        .hero-content { max-width: 580px; }
+        .tagline-sub { font-size: 12px; letter-spacing: 3px; color: var(--accent-pink); text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        .tagline-sub::before { content: ''; width: 25px; height: 2px; background-color: var(--accent-pink); }
+        .hero-title { font-size: 54px; font-weight: 900; line-height: 1.1; margin-bottom: 22px; }
+        .hero-title span { color: var(--accent-pink); }
+        .hero-description { color: var(--text-secondary); font-size: 14px; letter-spacing: 1px; line-height: 1.7; margin-bottom: 35px; font-weight: 600; }
+
+        .cta-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-pink), #e05574); color: #fff; padding: 14px 28px;
+            border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px;
+            display: flex; align-items: center; gap: 10px; transition: var(--transition); cursor: pointer; border: none;
+            box-shadow: 0 8px 25px rgba(255, 107, 139, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255, 107, 139, 0.5); }
+        .btn-secondary { border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 13px; transition: var(--transition); background: rgba(255, 255, 255, 0.03); cursor: pointer;}
+
+        .mannequin-wrapper { position: relative; display: flex; justify-content: center; align-items: center; flex: 1; }
+        .mannequin-img { max-height: 60vh; width: auto; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(255, 107, 139, 0.25); animation: float 4s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-18px); } 100% { transform: translateY(0px); } }
+
+        /* Interactive Studio Section */
+        .designer-section { padding: 80px 8%; background: rgba(10, 10, 12, 0.98); border-top: 1px solid var(--border-color); }
+        .section-title { text-align: center; margin-bottom: 30px; }
+        .section-title h2 { font-size: 32px; font-weight: 800; }
+        .section-title h2 span { color: var(--accent-pink); }
+        .section-title p { color: var(--text-secondary); font-size: 13px; margin-top: 8px; }
+
+        .studio-container { display: flex; justify-content: space-between; align-items: stretch; gap: 30px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 30px; }
+        .studio-preview { flex: 1.2; position: relative; display: flex; justify-content: center; align-items: center; min-height: 480px; background: radial-gradient(circle, rgba(255,107,139,0.12) 0%, rgba(0,0,0,0) 70%); border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden; }
+        
+        .tshirt-svg-wrapper { position: relative; width: 340px; height: 400px; display: flex; justify-content: center; align-items: center; }
+        .tshirt-svg-wrapper svg { width: 100%; height: 100%; filter: drop-shadow(0px 10px 20px rgba(0,0,0,0.5)); }
+
+        .draggable-element {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            touch-action: none;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed transparent;
+            transition: border 0.2s;
+        }
+        .draggable-element:hover, .draggable-element:active {
+            border: 1px dashed var(--accent-pink);
+        }
+
+        .graphic-icon-overlay { font-size: 48px; color: #ff6b8b; text-shadow: 0 4px 12px rgba(0,0,0,0.4); pointer-events: none; }
+        .live-text-overlay { font-weight: 900; font-size: 18px; color: #000000; text-shadow: 0 1px 4px rgba(255,255,255,0.6); pointer-events: none; text-align: center; letter-spacing: 1px; word-break: break-word; }
+
+        .studio-controls { flex: 1; display: flex; flex-direction: column; gap: 18px; max-height: 520px; overflow-y: auto; padding-right: 5px; }
+        .control-block { display: flex; flex-direction: column; gap: 8px; background: var(--bg-lighter); padding: 14px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .control-label { font-size: 12px; font-weight: 700; color: var(--accent-pink); display: flex; align-items: center; gap: 6px; }
+
+        .graphics-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+        .shape-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: var(--transition); font-size: 18px; }
+        .shape-btn:hover, .shape-btn.selected { border-color: var(--accent-pink); color: var(--accent-pink); background: rgba(255, 107, 139, 0.15); transform: translateY(-2px); }
+
+        .color-picker-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .color-picker-input { -webkit-appearance: none; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; background: transparent; }
+        .color-picker-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker-input::-webkit-color-swatch { border: 2px solid var(--border-color); border-radius: 50%; }
+
+        .preset-colors { display: flex; gap: 8px; }
+        .color-btn { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: var(--transition); }
+        .color-btn:hover { transform: scale(1.15); }
+
+        .custom-text-input { background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 13px; outline: none; width: 100%; }
+        .custom-text-input:focus { border-color: var(--accent-pink); }
+
+        .text-controls-row { display: flex; gap: 10px; align-items: center; }
+        .range-slider { flex: 1; accent-color: var(--accent-pink); }
+
+        /* Collection Section Category Headers */
+        .collection-section { padding: 60px 8%; }
+        .category-header { margin: 50px 0 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .category-header h3 { font-size: 22px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .category-header h3 span { color: var(--accent-pink); }
+        .category-badge { background: var(--bg-lighter); color: var(--accent-pink); font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-color); font-weight: 700; }
+
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; width: 100%; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; transition: var(--transition); display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-5px); border-color: rgba(255, 107, 139, 0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .product-thumb { height: 280px; background: #0f1016; display: flex; align-items: center; justify-content: center; padding: 10px; overflow: hidden; position: relative; }
+        .product-thumb img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition); }
+        .product-card:hover .product-thumb img { transform: scale(1.05); }
+        .product-info { padding: 18px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; justify-content: space-between; }
+        .product-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.3; }
+        .product-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+        .product-price { font-size: 17px; font-weight: 800; color: var(--accent-pink); }
+        .add-cart-btn { background: var(--bg-lighter); border: 1px solid var(--border-color); color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition); }
+        .add-cart-btn:hover { background: var(--accent-pink); border-color: var(--accent-pink); }
+
+        /* Cart & Order Modal */
+        .cart-drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; opacity: 0; pointer-events: none; transition: var(--transition); }
+        .cart-drawer-overlay.open { opacity: 1; pointer-events: auto; }
+        .cart-drawer { position: fixed; top: 0; right: -420px; width: 100%; max-width: 420px; height: 100vh; background: var(--bg-card); border-left: 1px solid var(--border-color); z-index: 1001; display: flex; flex-direction: column; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 25px; }
+        .cart-drawer-overlay.open .cart-drawer { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .cart-items-list { flex: 1; overflow-y: auto; padding: 15px 0; display: flex; flex-direction: column; gap: 12px; }
+        .cart-item { display: flex; gap: 12px; background: var(--bg-lighter); padding: 10px; border-radius: 8px; align-items: center; border: 1px solid var(--border-color); }
+
+        .modal-backdrop { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-backdrop.open { display: flex; }
+        .order-modal { background: var(--bg-card); border: 1px solid var(--accent-pink); border-radius: var(--radius-lg); width: 100%; max-width: 580px; padding: 25px; box-shadow: 0 10px 40px rgba(255, 107, 139, 0.2); max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 15px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: span 2; }
+        .form-group label { font-size: 11px; font-weight: 700; color: var(--text-secondary); }
+        .form-control { background: var(--bg-lighter); border: 1px solid var(--border-color); color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13px; outline: none; }
+        .form-control:focus { border-color: var(--accent-pink); }
+
+        .payment-box { background: rgba(255, 107, 139, 0.08); border: 1px dashed var(--accent-pink); border-radius: 10px; padding: 15px; margin-top: 5px; }
+        .payment-number-badge { font-family: 'Space Grotesk', monospace; font-size: 18px; font-weight: 800; color: var(--accent-green); background: #000; padding: 6px 12px; border-radius: 6px; display: inline-block; margin-top: 4px; letter-spacing: 1px; }
+
+        .disclaimer-box { background: rgba(255, 71, 87, 0.1); border: 1px solid var(--accent-red); border-radius: 8px; padding: 12px 14px; margin-bottom: 15px; display: flex; gap: 10px; align-items: flex-start; }
+        .disclaimer-box i { color: var(--accent-red); font-size: 16px; margin-top: 2px; }
+        .disclaimer-text { font-size: 11px; color: var(--text-primary); line-height: 1.5; font-weight: 600; }
+        .disclaimer-text strong { color: var(--accent-red); font-weight: 800; }
+
+        /* Admin Styles */
+        .admin-container { padding: 40px 5%; display: flex; flex-direction: column; gap: 25px; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .metric-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px; display: flex; align-items: center; justify-content: space-between; }
+        .metric-info h3 { font-size: 24px; font-weight: 800; margin-top: 4px; }
+        .metric-info p { color: var(--text-secondary); font-size: 11px; font-weight: 600; }
+        .metric-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+        .table-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow-x: auto; }
+        .orders-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .orders-table th { background: var(--bg-lighter); color: var(--accent-pink); padding: 14px 16px; font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--border-color); }
+        .orders-table td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 12px; vertical-align: middle; }
+        .screenshot-thumb { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; cursor: pointer; border: 1px solid var(--accent-pink); }
+
+        .toast { position: fixed; bottom: 30px; right: 30px; background: var(--accent-pink); color: #fff; padding: 12px 22px; border-radius: 30px; font-weight: 700; font-size: 13px; box-shadow: 0 10px 25px rgba(255, 107, 139, 0.4); display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: var(--transition); z-index: 3000; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            .hero-body { flex-direction: column; text-align: center; }
+            .hero-title { font-size: 38px; }
+            .studio-container { flex-direction: column; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+            .graphics-grid { grid-template-columns: repeat(3, 1fr); }
+            .nav-tabs { overflow-x: auto; max-width: 50%; }
+            .view-tab-btn { font-size: 11px; padding: 6px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Navigation -->
+    <header>
+        <nav class="navbar">
+            <a href="#" class="logo">M<span>Ø</span>A</a>
+
+            <div class="nav-tabs">
+                <button class="view-tab-btn active" id="storeTabBtn" onclick="switchMainView('storeView', this)">
+                    <i class="fas fa-store"></i> Store & Studio
+                </button>
+                <button class="view-tab-btn" id="designsTabBtn" onclick="switchMainView('designsView', this)">
+                    <i class="fas fa-palette"></i> Saved Designs (<span id="savedCount">0</span>)
+                </button>
+            </div>
+
+            <div class="nav-actions">
+                <a href="https://www.facebook.com/share/18fPgT73Zt/" target="_blank" class="social-nav-btn" title="Facebook Page"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://wa.me/201278956222" target="_blank" class="social-nav-btn" title="WhatsApp Contact"><i class="fab fa-whatsapp"></i></a>
+
+                <button class="cart-trigger-btn" onclick="toggleCartDrawer()">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartBadgeCount">0</span>
+                </button>
+
+                <button class="admin-secret-btn" id="adminTabBtn" title="Settings" onclick="switchMainView('adminView', this)">
+                    <i class="fas fa-sliders"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- STORE VIEW -->
+    <main id="storeView" class="app-view active">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-body">
+                <div class="hero-content">
+                    <div class="tagline-sub">WELCOME TO MØA APPAREL</div>
+                    <h1 class="hero-title">WEAR YOUR <span>IDEA.</span></h1>
+                    <p class="hero-description">Design your vision live in real-time, customize typography and graphics, or choose from our exclusive collection.</p>
+                    <div class="cta-buttons">
+                        <a href="#designer" class="btn-primary">Start Customizing <i class="fas fa-arrow-right"></i></a>
+                        <a href="#collection" class="btn-secondary">Shop Collection</a>
+                    </div>
+                </div>
+
+                <div class="mannequin-wrapper">
+                    <img src="7.jpeg" alt="MØA Resort Collection" class="mannequin-img">
+                </div>
+            </div>
+        </section>
+
+        <!-- Design Studio -->
+        <section class="designer-section" id="designer">
+            <div class="section-title">
+                <h2>Interactive <span>Design Studio</span></h2>
+                <p>Drag elements freely, change shirt color, typography, and emblems in real-time</p>
+            </div>
+
+            <div class="studio-container">
+                <div class="studio-preview" id="studioPreview">
+                    <div class="tshirt-svg-wrapper" id="tshirtWrapper">
+                        <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" id="tshirtSvg">
+                            <path id="tshirtBody" fill="#ffffff" stroke="#cccccc" stroke-width="3" d="M 150 70 Q 200 110 250 110 Q 300 110 350 70 L 440 130 L 390 220 L 350 190 L 350 430 Q 250 440 150 430 L 150 190 L 110 220 L 60 130 Z" />
+                            <path fill="none" stroke="#bbbbbb" stroke-width="3" d="M 150 70 Q 250 125 350 70" />
+                        </svg>
+
+                        <div class="draggable-element" id="dragIcon" style="top: 110px; left: 145px;">
+                            <div class="graphic-icon-overlay" id="graphicOverlay"><i class="fas fa-skull-crossbones"></i></div>
+                        </div>
+
+                        <div class="draggable-element" id="dragText" style="top: 180px; left: 100px;">
+                            <div class="live-text-overlay" id="liveTextOverlay">CUSTOM TEXT</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="studio-controls">
+                    <div class="control-block">
+                        <span class="control-label"><i class="fas fa-shirt"></i> 1. T-Shirt Color:</span>
+                        <div class="color-picker-row">
+                            <input type="color" class="color-picker-input" id="shirtColorPicker" value="#ffffff" onchange="updateShirtColor(this.value)">
+                            <div class="preset-colors">
+                                <div class="color-btn" style="background: #ffffff; border: 1px solid #ccc;" onclick="updateShirtColor('#ffffff')"></div>
+                                <div class="color-btn" style="background: #111111;" onclick="updateShirtColor('#111111')"></div>
+                                <div class="color-btn" style="background: #ff6b8b;" onclick="updateShirtColor('#ff6b8b')"></div>
+                                <div class="color-btn" style="background: #2ed573;" onclick="updateShirtColor('#2ed573')"></div>
+                                <div class="color-btn" style="background: #1e90ff;" onclick="updateShirtColor('#1e90ff')"></div>
+                                <div class="color-btn" style="background: #ffa502;" onclick="updateShirtColor('#ffa502')"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-block">
+                        <span class="control-label"><i class="fas fa-font"></i> 2. Custom Typography:</span>
+                        <input type="text" class="custom-text-input" placeholder="Type your slogan..." value="CUSTOM TEXT" oninput="updateLiveText(this.value)">
+                        <div class="text-controls-row" style="margin-top: 8px;">
+                            <span style="font-size: 11px; color: var(--text-secondary);">Font Size:</span>
+                            <input type="range" class="range-slider" min="12" max="36" value="18" oninput="updateFontSize(this.value)">
+                        </div>
+                    </div>
+
+                    <div class="control-block">
+                        <span class="control-label"><i class="fas fa-palette"></i> 3. Text & Emblem Color:</span>
+                        <div class="color-picker-row">
+                            <input type="color" class="color-picker-input" id="textColorPicker" value="#000000" onchange="updateTextColor(this.value)">
+                            <div class="preset-colors">
+                                <div class="color-btn" style="background: #000000;" onclick="updateTextColor('#000000')"></div>
+                                <div class="color-btn" style="background: #ffffff; border: 1px solid #ccc;" onclick="updateTextColor('#ffffff')"></div>
+                                <div class="color-btn" style="background: #ff6b8b;" onclick="updateTextColor('#ff6b8b')"></div>
+                                <div class="color-btn" style="background: #ffa502;" onclick="updateTextColor('#ffa502')"></div>
+                                <div class="color-btn" style="background: #2ed573;" onclick="updateTextColor('#2ed573')"></div>
+                                <div class="color-btn" style="background: #00d2d3;" onclick="updateTextColor('#00d2d3')"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-block">
+                        <span class="control-label"><i class="fas fa-shapes"></i> 4. Choose Emblem / Icon:</span>
+                        <div class="graphics-grid">
+                            <button class="shape-btn selected" onclick="applyGraphic('fa-skull-crossbones', this)"><i class="fas fa-skull-crossbones"></i></button>
+                            <button class="shape-btn" onclick="applyGraphic('fa-crown', this)"><i class="fas fa-crown"></i></button>
+                            <button class="shape-btn" onclick="applyGraphic('fa-fire', this)"><i class="fas fa-fire"></i></button>
+                            <button class="shape-btn" onclick="applyGraphic('fa-bolt', this)"><i class="fas fa-bolt"></i></button>
+                            <button class="shape-btn" onclick="applyGraphic('fa-dragon', this)"><i class="fas fa-dragon"></i></button>
+                            <button class="shape-btn" onclick="applyGraphic('fa-ghost', this)"><i class="fas fa-ghost"></i></button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-primary" style="flex: 1; justify-content: center;" onclick="saveDesignAndFinish()"><i class="fas fa-check-circle"></i> Save Design</button>
+                        <button class="btn-secondary" style="flex: 1; justify-content: center;" onclick="addCustomToCart()"><i class="fas fa-cart-plus"></i> Add to Cart ($39.99)</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ALL PRODUCTS COLLECTION SECTION -->
+        <section class="collection-section" id="collection">
+            <div class="section-title">
+                <h2>Complete <span>MØA Collections</span></h2>
+                <p>Explore our full range of apparel, activewear, and accessories.</p>
+            </div>
+
+            <!-- CATEGORY 1: RESORT COLLECTION -->
+            <div class="category-header">
+                <h3><i class="fas fa-umbrella-beach" style="color:var(--accent-pink);"></i> Ø.ESSENCE Resort Collection <span>Summer '26</span></h3>
+                <span class="category-badge">Linen & Rayon Blends</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="7.jpeg" alt="Resort Midnight"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">01. Midnight Resort Set</h4>
+                        <p class="product-desc">Pure, Timeless, Intense Black Linen-Rayon Shirt & Shorts Set.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$65.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('01. Midnight Resort Set', 65.00, '7.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="7.jpeg" alt="Resort Ivory"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">02. Ivory Resort Set</h4>
+                        <p class="product-desc">Clean, Calm, Understated Cream Linen Set.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$65.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('02. Ivory Resort Set', 65.00, '7.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="7.jpeg" alt="Resort Sand"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">03. Sand Resort Set</h4>
+                        <p class="product-desc">Natural, Warm, Effortless Sand Tone Set.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$65.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('03. Sand Resort Set', 65.00, '7.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="7.jpeg" alt="Resort Olive"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">04. Olive Resort Set</h4>
+                        <p class="product-desc">Earthy, Modern, Balanced Green Set.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$65.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('04. Olive Resort Set', 65.00, '7.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="7.jpeg" alt="Resort Ocean"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">05. Ocean Resort Set</h4>
+                        <p class="product-desc">Fresh, Breezy, Limitless Sky Blue Set.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$65.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('05. Ocean Resort Set', 65.00, '7.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="7.jpeg" alt="Resort Mocha"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">06. Mocha Resort Set</h4>
+                        <p class="product-desc">Rich, Smooth, Elevated Brown Set.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$65.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('06. Mocha Resort Set', 65.00, '7.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="7.jpeg" alt="Resort Sage"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">07. Sage Resort Set</h4>
+                        <p class="product-desc">Soft, Organic, Distinct Sage Green Set.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$65.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('07. Sage Resort Set', 65.00, '7.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="7.jpeg" alt="Resort White"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">08. Crisp White Resort Set</h4>
+                        <p class="product-desc">Pure, Iconic White Linen Vacation Set.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$65.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('08. Crisp White Resort Set', 65.00, '7.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY 1.5: SUMMER TROUSER COLLECTION -->
+            <div class="category-header">
+                <h3><i class="fas fa-bars-staggered" style="color:var(--accent-pink);"></i> Ø.ESSENCE Summer Trouser Collection <span>SS 2026</span></h3>
+                <span class="category-badge">Linen & Rayon Blends (Lightweight & Refined)</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="8.jpeg" alt="Midnight Trouser"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">01. Midnight Linen Trouser</h4>
+                        <p class="product-desc">Pure, Timeless, Intense Black Linen-Rayon Tailored Trouser.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('01. Midnight Linen Trouser', 45.00, '8.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="8.jpeg" alt="Ivory Trouser"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">02. Ivory Linen Trouser</h4>
+                        <p class="product-desc">Clean, Calm, Understated Ivory Tone Summer Pants.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('02. Ivory Linen Trouser', 45.00, '8.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="8.jpeg" alt="Sand Trouser"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">03. Sand Linen Trouser</h4>
+                        <p class="product-desc">Natural, Warm, Effortless Sand Shade Pleated Pants.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('03. Sand Linen Trouser', 45.00, '8.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="8.jpeg" alt="Olive Trouser"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">04. Olive Linen Trouser</h4>
+                        <p class="product-desc">Earthy, Modern, Balanced Olive Green Casual Trouser.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('04. Olive Linen Trouser', 45.00, '8.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="8.jpeg" alt="Ocean Trouser"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">05. Ocean Linen Trouser</h4>
+                        <p class="product-desc">Fresh, Breezy, Limitless Ocean Blue Linen Trouser.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('05. Ocean Linen Trouser', 45.00, '8.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="8.jpeg" alt="Mocha Trouser"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">06. Mocha Linen Trouser</h4>
+                        <p class="product-desc">Rich, Smooth, Elevated Mocha Brown Linen Pants.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('06. Mocha Linen Trouser', 45.00, '8.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="8.jpeg" alt="Sage Trouser"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">07. Sage Linen Trouser</h4>
+                        <p class="product-desc">Soft, Organic, Distinct Sage Green Summer Pants.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('07. Sage Linen Trouser', 45.00, '8.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="8.jpeg" alt="White Trouser"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">08. Crisp White Linen Trouser</h4>
+                        <p class="product-desc">Pure, Iconic Crisp White Lightweight Vacation Pants.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('08. Crisp White Linen Trouser', 45.00, '8.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY 2: SWEAT SERIES -->
+            <div class="category-header">
+                <h3><i class="fas fa-layer-group" style="color:var(--accent-pink);"></i> Ø.ESSENCE Sweat Series <span>Pants</span></h3>
+                <span class="category-badge">420–460 GSM Heavyweight French Terry</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="4.jpeg" alt="Sweat Pants Jet Black"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Jet Black Heavy Sweatpants</h4>
+                        <p class="product-desc">Baggy fit, hidden zipper pockets, thick drawcords with metal tips.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$52.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Jet Black Heavy Sweatpants', 52.00, '4.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="4.jpeg" alt="Sweat Pants Stone Beige"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Stone Beige Sweatpants</h4>
+                        <p class="product-desc">Straight wide leg fit, tone-on-tone subtle embroidery.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$52.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Stone Beige Sweatpants', 52.00, '4.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="4.jpeg" alt="Sweat Pants Ash Grey"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Ash Grey Relaxed Sweatpants</h4>
+                        <p class="product-desc">Heavyweight Terry, premium YKK hidden pockets.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$52.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Ash Grey Sweatpants', 52.00, '4.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="4.jpeg" alt="Sweat Pants Off White"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Off White Street Sweatpants</h4>
+                        <p class="product-desc">Relaxed comfort, timeless design & back pocket detail.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$52.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Off White Sweatpants', 52.00, '4.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="4.jpeg" alt="Sweat Pants Olive Green"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Olive Green Premium Sweatpants</h4>
+                        <p class="product-desc">Earthy tone, thick drawcords with matte black tips.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$52.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Olive Green Sweatpants', 52.00, '4.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="4.jpeg" alt="Sweat Pants Chocolate Brown"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Chocolate Brown Sweatpants</h4>
+                        <p class="product-desc">Ultra-comfortable heavyweight French Terry.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$52.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Chocolate Brown Sweatpants', 52.00, '4.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY 3: FORMAL & CASUAL SHIRTS -->
+            <div class="category-header">
+                <h3><i class="fas fa-user-tie" style="color:var(--accent-pink);"></i> MØA Premium <span>Shirts</span></h3>
+                <span class="category-badge">Modern Tailored Fit</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="9.jpeg" alt="MØA Black Formal Shirt"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">MØA Signature Black Button Shirt</h4>
+                        <p class="product-desc">Built to last, soft & comfortable fabric with embroidered chest logo and branded cuffs.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$48.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('MØA Signature Black Button Shirt', 48.00, '9.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY 4: TANK TOP COLLECTION '26 -->
+            <div class="category-header">
+                <h3><i class="fas fa-vest" style="color:var(--accent-pink);"></i> MØA Tank Top Collection <span>'26</span></h3>
+                <span class="category-badge">Premium Lightweight Cotton</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="6.jpeg" alt="Tank Top Black"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Athletic Fit Tank Top - Black</h4>
+                        <p class="product-desc">Back print Ø logo, woven tag, breathable cotton.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$28.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Athletic Tank Top - Black', 28.00, '6.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="6.jpeg" alt="Tank Top Off White"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Athletic Fit Tank Top - Off White</h4>
+                        <p class="product-desc">Built for performance & everyday lifestyle.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$28.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Athletic Tank Top - Off White', 28.00, '6.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="6.jpeg" alt="Tank Top Sage"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Athletic Fit Tank Top - Sage</h4>
+                        <p class="product-desc">Earthy sage tone, durable and light fabric.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$28.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Athletic Tank Top - Sage', 28.00, '6.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="6.jpeg" alt="Tank Top Sand"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Athletic Fit Tank Top - Sand</h4>
+                        <p class="product-desc">Clean design made to move with you.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$28.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Athletic Tank Top - Sand', 28.00, '6.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="6.jpeg" alt="Tank Top Pink"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Athletic Fit Tank Top - Dusty Pink</h4>
+                        <p class="product-desc">Simple, clean, timeless summer workout essential.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$28.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Athletic Tank Top - Pink', 28.00, '6.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY 5: GYM LINE - PERFORMANCE TEES -->
+            <div class="category-header">
+                <h3><i class="fas fa-dumbbell" style="color:var(--accent-pink);"></i> Ø.ESSENCE Gym Line <span>Performance Tees</span></h3>
+                <span class="category-badge">78% Nylon / 22% Spandex (4-Way Stretch)</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 01"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">01 Origin Black Performance Tee</h4>
+                        <p class="product-desc">Moisture wicking, second skin feel, pressure graphic back.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('01 Origin Black Performance Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 02"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">02 System Charcoal Performance Tee</h4>
+                        <p class="product-desc">System 01 Grid back design, athletic compression fit.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('02 System Charcoal Performance Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 03"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">03 Muscle Map Stone Performance Tee</h4>
+                        <p class="product-desc">Anatomical muscle map artwork back print.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('03 Muscle Map Stone Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 04"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">04 Forged Black Performance Tee</h4>
+                        <p class="product-desc">"Forged Under Pressure" back print.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('04 Forged Black Performance Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 05"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">05 Reps Off-White Performance Tee</h4>
+                        <p class="product-desc">"No Shortcuts" number list print.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('05 Reps Off-White Performance Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 06"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">06 Essence Black Performance Tee</h4>
+                        <p class="product-desc">Minimal front logo, oversized back emblem.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('06 Essence Black Performance Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 07"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">07 Division Olive Performance Tee</h4>
+                        <p class="product-desc">Division Athletic Dept. print.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('07 Division Olive Performance Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 08"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">08 Machine Stone Performance Tee</h4>
+                        <p class="product-desc">"Built Not Born" dumbbell blueprint artwork.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('08 Machine Stone Performance Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 09"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">09 Elevation Charcoal Performance Tee</h4>
+                        <p class="product-desc">"Keep Climbing" topographic line artwork.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('09 Elevation Charcoal Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="10.jpeg" alt="Performance Tee 10"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">10 Signature Off-White Performance Tee</h4>
+                        <p class="product-desc">Ø.ESSENCE bold back typography.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$38.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('10 Signature Off-White Tee', 38.00, '10.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY 6: GYM LINE - PERFORMANCE TANKS -->
+            <div class="category-header">
+                <h3><i class="fas fa-running" style="color:var(--accent-pink);"></i> Ø.ESSENCE Gym Line <span>Performance Tanks</span></h3>
+                <span class="category-badge">Deep Armhole Cut & Flatlock Seams</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="13.jpeg" alt="Performance Tank 01"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">01 Origin Black Performance Tank</h4>
+                        <p class="product-desc">Deep armhole cut, silicone logo, back graphic.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$32.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('01 Origin Black Tank', 32.00, '13.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="13.jpeg" alt="Performance Tank 02"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">02 System Charcoal Performance Tank</h4>
+                        <p class="product-desc">Lightweight stretch nylon blend, charcoal color.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$32.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('02 System Charcoal Tank', 32.00, '13.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="13.jpeg" alt="Performance Tank 03"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">03 Muscle Map Stone Performance Tank</h4>
+                        <p class="product-desc">Engineered to evolve muscle map print.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$32.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('03 Muscle Map Stone Tank', 32.00, '13.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="13.jpeg" alt="Performance Tank 04"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">04 Forged Black Performance Tank</h4>
+                        <p class="product-desc">Forged Under Pressure workout tank.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$32.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('04 Forged Black Tank', 32.00, '13.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="13.jpeg" alt="Performance Tank 05"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">05 Reps Off-White Performance Tank</h4>
+                        <p class="product-desc">Clean off-white performance stretch tank.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$32.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('05 Reps Off-White Tank', 32.00, '13.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="13.jpeg" alt="Performance Tank 07"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">07 Division Olive Performance Tank</h4>
+                        <p class="product-desc">Olive green training cut tank top.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$32.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('07 Division Olive Tank', 32.00, '13.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY 7: OVERSIZED HEAVYWEIGHT TEES -->
+            <div class="category-header">
+                <h3><i class="fas fa-tshirt" style="color:var(--accent-pink);"></i> Ø.ESSENCE <span>Heavyweight Oversized Tees</span></h3>
+                <span class="category-badge">300 GSM Heavy Cotton (Drop Shoulder)</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="12.jpeg" alt="Oversized Tee 01"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">01 Origin Black Heavy Oversized Tee</h4>
+                        <p class="product-desc">"Pressure Creates Essence" back graphic, Puff/High density print.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('01 Origin Black Oversized Tee', 45.00, '12.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="12.jpeg" alt="Oversized Tee 02"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">02 System Charcoal Heavy Oversized Tee</h4>
+                        <p class="product-desc">System 01 Grid blueprint back, woven hem tag.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('02 System Charcoal Oversized Tee', 45.00, '12.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="12.jpeg" alt="Oversized Tee 03"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">03 Muscle Map Stone Heavy Oversized Tee</h4>
+                        <p class="product-desc">Engineered to Evolve anatomical print, stone color.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('03 Muscle Map Stone Oversized Tee', 45.00, '12.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="12.jpeg" alt="Oversized Tee 04"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">04 Forged Black Heavy Oversized Tee</h4>
+                        <p class="product-desc">Forged Under Pressure vintage wash print.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('04 Forged Black Oversized Tee', 45.00, '12.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="12.jpeg" alt="Oversized Tee 07"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">07 Division Olive Heavy Oversized Tee</h4>
+                        <p class="product-desc">Division Athletic graphic, premium drop shoulder fit.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('07 Division Olive Oversized Tee', 45.00, '12.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="12.jpeg" alt="Oversized Tee 08"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">08 Machine Stone Heavy Oversized Tee</h4>
+                        <p class="product-desc">Built Not Born dumbbell illustration, 300 GSM cotton.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$45.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('08 Machine Stone Oversized Tee', 45.00, '12.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY 8: CONCEPT SERIES -->
+            <div class="category-header">
+                <h3><i class="fas fa-cut" style="color:var(--accent-pink);"></i> MØA Concept Series <span>The String Theory</span></h3>
+                <span class="category-badge">Premium 100% Cotton Limited Edition Drops</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="11.jpeg" alt="String Theory Main"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">The String Theory Tee (Black)</h4>
+                        <p class="product-desc">Signature Back String Design connecting strength and softness.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$49.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('The String Theory Tee (Black)', 49.00, '11.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="11.jpeg" alt="Void Bloom"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">01. Void Bloom Graphic Tee</h4>
+                        <p class="product-desc">Dark floral back graphic, minimal front Ø logo.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$46.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('01. Void Bloom Graphic Tee', 46.00, '11.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="11.jpeg" alt="Drape Line"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">02. Drape Line Cut Tee (Bone)</h4>
+                        <p class="product-desc">Relaxed oversized cut with back drape cutout detail.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$46.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('02. Drape Line Cut Tee', 46.00, '11.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="11.jpeg" alt="Lunar Flow"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">03. Lunar Flow Earth Brown Tee</h4>
+                        <p class="product-desc">Moon phases spine artwork print on earth brown cotton.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$46.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('03. Lunar Flow Earth Brown Tee', 46.00, '11.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="11.jpeg" alt="Ink Silhouette"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">04. Ink Silhouette Dust Tee</h4>
+                        <p class="product-desc">Calligraphy ink brush back art on dust white tee.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$46.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('04. Ink Silhouette Dust Tee', 46.00, '11.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="11.jpeg" alt="Ø Cut"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">05. Ø Cut Triangular Back Tee</h4>
+                        <p class="product-desc">Geometric back cutout with signature metal tag.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$46.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('05. Ø Cut Triangular Back Tee', 46.00, '11.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY 9: SOCKS SERIES -->
+            <div class="category-header">
+                <h3><i class="fas fa-socks" style="color:var(--accent-pink);"></i> Ø.ESSENCE <span>Socks Series</span></h3>
+                <span class="category-badge">Combed Cotton & Silicone Heel Grip</span>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-thumb"><img src="5.jpeg" alt="No Show Socks"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">No Show - Invisible Fit Socks</h4>
+                        <p class="product-desc">Designed to disappear. Silicone heel grip, arch support & flat toe seam.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$12.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('No Show Invisible Socks', 12.00, '5.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="5.jpeg" alt="Ultra Low Socks"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Ultra Low - Lower Than Low Socks</h4>
+                        <p class="product-desc">Sits below the ankle line with zero visibility.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$12.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Ultra Low Socks', 12.00, '5.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-thumb"><img src="5.jpeg" alt="Socks Box Pack"></div>
+                    <div class="product-info">
+                        <h4 class="product-title">Ø.ESSENCE 6-Pair Gift Box Set</h4>
+                        <p class="product-desc">Includes Jet Black, Off White, Ash Grey, Stone, Olive & Chocolate.</p>
+                        <div class="product-footer">
+                            <span class="product-price">$48.00</span>
+                            <button class="add-cart-btn" onclick="addToCart('Ø.ESSENCE 6-Pair Socks Gift Box', 48.00, '5.jpeg')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- SAVED DESIGNS VIEW -->
+    <main id="designsView" class="app-view">
+        <div class="designs-container">
+            <div class="section-title">
+                <h2>Saved <span>Designs Gallery</span></h2>
+                <p>Browse all custom creations you saved by clicking "Save Design"</p>
+            </div>
+            <div class="designs-grid" id="savedDesignsGrid"></div>
+        </div>
+    </main>
+
+    <!-- ADMIN DASHBOARD VIEW -->
+    <main id="adminView" class="app-view">
+        <div class="admin-container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2><i class="fas fa-boxes" style="color: var(--accent-pink);"></i> Live Orders Management Dashboard</h2>
+                <span style="color: var(--accent-green); font-size: 12px; font-weight: 700;"><i class="fas fa-circle"></i> Online - Live Receiving</span>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-info"><p>Total Orders</p><h3 id="totalOrdersCount">0</h3></div>
+                    <div class="metric-icon" style="background: rgba(255, 107, 139, 0.15); color: var(--accent-pink);"><i class="fas fa-shopping-bag"></i></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-info"><p>Pending Orders</p><h3 id="pendingOrdersCount">0</h3></div>
+                    <div class="metric-icon" style="background: rgba(255, 165, 2, 0.15); color: var(--accent-yellow);"><i class="fas fa-hourglass-half"></i></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-info"><p>Total Revenue</p><h3 id="totalRevenue">$0.00</h3></div>
+                    <div class="metric-icon" style="background: rgba(46, 213, 115, 0.15); color: var(--accent-green);"><i class="fas fa-wallet"></i></div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer & Phone</th>
+                            <th>Governorate & Address</th>
+                            <th>Items Ordered</th>
+                            <th>Size / Wt / Color</th>
+                            <th>Payment Method</th>
+                            <th>Payment Proof</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminOrdersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- CART DRAWER -->
+    <div class="cart-drawer-overlay" id="cartOverlay" onclick="toggleCartDrawer()">
+        <div class="cart-drawer" onclick="event.stopPropagation()">
+            <div class="cart-header">
+                <h3>Shopping Cart</h3>
+                <button onclick="toggleCartDrawer()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cart-items-list" id="cartItemsContainer"></div>
+            <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:16px; margin-bottom:15px;">
+                    <span>Total:</span>
+                    <span id="cartTotalPrice">$0.00</span>
+                </div>
+                <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="openOrderModal()">Checkout & Fill Details <i class="fas fa-check-circle"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDER FORM MODAL -->
+    <div class="modal-backdrop" id="orderModal">
+        <div class="order-modal">
+            <div class="modal-title">Order & Payment Details</div>
+            <form id="checkoutForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Full Name:</label>
+                        <input type="text" class="form-control" id="custName" required placeholder="e.g. Ahmed Ramadan">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number:</label>
+                        <input type="tel" class="form-control" id="custPhone" required placeholder="010xxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>Secondary Phone (Optional):</label>
+                        <input type="tel" class="form-control" id="custPhone2" placeholder="011xxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>Governorate / City:</label>
+                        <input type="text" class="form-control" id="custGov" required placeholder="Cairo / Alexandria...">
+                    </div>
+                    <div class="form-group">
+                        <label>Select Size:</label>
+                        <select class="form-control" id="custSize">
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L" selected>L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (kg):</label>
+                        <input type="number" class="form-control" id="custWeight" placeholder="e.g. 75" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Shirt Color:</label>
+                        <select class="form-control" id="custColor">
+                            <option value="Pure White">Pure White</option>
+                            <option value="Obsidian Black">Obsidian Black</option>
+                            <option value="Pink Accent">Pink Accent</option>
+                            <option value="Custom Accent">Custom Accent</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label>Detailed Address:</label>
+                        <textarea class="form-control" id="custAddress" rows="2" required placeholder="Street name, building no, apartment..."></textarea>
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Payment Method:</label>
+                        <select class="form-control" id="payMethod" onchange="togglePaymentFields(this.value)" required>
+                            <option value="">-- Select Payment Method --</option>
+                            <option value="InstaPay">InstaPay</option>
+                            <option value="Vodafone Cash">Vodafone Cash</option>
+                            <option value="Cash on Delivery (COD)">Cash on Delivery (COD)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full payment-box" id="paymentInfoBox" style="display: none;">
+                        <span style="font-size: 12px; font-weight: 700; color: #fff;">
+                            <i class="fas fa-wallet" style="color:var(--accent-pink);"></i> Dedicated Payment Number for <span id="payMethodName"></span>:
+                        </span>
+                        <div>
+                            <span class="payment-number-badge">01038843647</span>
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">Please transfer the exact amount and attach a clear transaction screenshot below to confirm your order.</p>
+                    </div>
+
+                    <div class="form-group full" id="screenshotGroup" style="display: none;">
+                        <label>Attach Payment Screenshot:</label>
+                        <input type="file" class="form-control" id="payScreenshot" accept="image/*">
+                    </div>
+                </div>
+
+                <div class="disclaimer-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="disclaimer-text">
+                        <strong>Important Shipping Notice:</strong> By confirming this order, you agree to inspect and receive your package. In the event of order refusal upon delivery, <strong>the customer bears full responsibility for all incurred shipping expenses</strong>.
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button type="submit" class="btn-primary" style="flex:1; justify-content:center;">Confirm Order <i class="fas fa-paper-plane"></i></button>
+                    <button type="button" class="btn-secondary" onclick="closeOrderModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastText">Action completed successfully!</span>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "0000";
+
+        let cartItems = [];
+        let savedDesigns = JSON.parse(localStorage.getItem('moa_saved_designs')) || [];
+        let selectedIcon = 'fa-skull-crossbones';
+        let currentCustomText = 'CUSTOM TEXT';
+        let currentTextColor = '#000000';
+        let currentShirtColor = '#ffffff';
+        let currentScreenshotData = '';
+
+        document.getElementById('savedCount').innerText = savedDesigns.length;
+
+        function switchMainView(viewId, btnEl) {
+            if (viewId === 'adminView') {
+                const userPin = prompt("Enter Admin Password to access Management Tab:");
+                if (userPin === ADMIN_PASSWORD) {
+                    showToast("Admin access granted!");
+                } else {
+                    if (userPin !== null) alert("Incorrect Password! Access Denied.");
+                    return;
+                }
+            }
+
+            document.querySelectorAll('.view-tab-btn, .admin-secret-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+
+            btnEl.classList.add('active');
+            document.getElementById(viewId).classList.add('active');
+
+            if (viewId === 'adminView') renderAdminOrders();
+            else if (viewId === 'designsView') renderSavedDesigns();
+        }
+
+        function updateShirtColor(colorHex) {
+            currentShirtColor = colorHex;
+            document.getElementById('tshirtBody').setAttribute('fill', colorHex);
+            document.getElementById('shirtColorPicker').value = colorHex;
+        }
+
+        function updateLiveText(val) {
+            currentCustomText = val.toUpperCase();
+            document.getElementById('liveTextOverlay').textContent = currentCustomText;
+        }
+
+        function updateFontSize(val) {
+            document.getElementById('liveTextOverlay').style.fontSize = val + 'px';
+        }
+
+        function updateTextColor(colorHex) {
+            currentTextColor = colorHex;
+            document.getElementById('liveTextOverlay').style.color = colorHex;
+            document.getElementById('graphicOverlay').style.color = colorHex;
+            document.getElementById('textColorPicker').value = colorHex;
+        }
+
+        function applyGraphic(iconClass, btnEl) {
+            selectedIcon = iconClass;
+            document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('selected'));
+            btnEl.classList.add('selected');
+            document.getElementById('graphicOverlay').innerHTML = `<i class="fas ${iconClass}"></i>`;
+        }
+
+        function makeDraggable(element) {
+            let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
+            element.onmousedown = dragMouseDown;
+            element.ontouchstart = dragTouchStart;
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                mouseX = e.clientX; mouseY = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                posX = mouseX - e.clientX; posY = mouseY - e.clientY;
+                mouseX = e.clientX; mouseY = e.clientY;
+                element.style.top = (element.offsetTop - posY) + "px";
+                element.style.left = (element.offsetLeft - posX) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null; document.onmousemove = null;
+            }
+
+            function dragTouchStart(e) {
+                const touch = e.touches[0];
+                mouseX = touch.clientX; mouseY = touch.clientY;
+                document.ontouchend = closeTouchDrag;
+                document.ontouchmove = touchDrag;
+            }
+
+            function touchDrag(e) {
+                const touch = e.touches[0];
+                posX = mouseX - touch.clientX; posY = mouseY - touch.clientY;
+                mouseX = touch.clientX; mouseY = touch.clientY;
+                element.style.top = (element.offsetTop - posY) + "px";
+                element.style.left = (element.offsetLeft - posX) + "px";
+            }
+
+            function closeTouchDrag() {
+                document.ontouchend = null; document.ontouchmove = null;
+            }
+        }
+
+        makeDraggable(document.getElementById('dragIcon'));
+        makeDraggable(document.getElementById('dragText'));
+
+        function saveDesignAndFinish() {
+            const svgContent = document.getElementById('tshirtWrapper').innerHTML;
+            const designObj = {
+                id: Date.now(),
+                text: currentCustomText,
+                shirtColor: currentShirtColor,
+                icon: selectedIcon,
+                textColor: currentTextColor,
+                svgMarkup: svgContent,
+                date: new Date().toLocaleDateString()
+            };
+
+            savedDesigns.unshift(designObj);
+            localStorage.setItem('moa_saved_designs', JSON.stringify(savedDesigns));
+            document.getElementById('savedCount').innerText = savedDesigns.length;
+
+            showToast("Design saved successfully!");
+            switchMainView('designsView', document.getElementById('designsTabBtn'));
+        }
+
+        function renderSavedDesigns() {
+            const grid = document.getElementById('savedDesignsGrid');
+            grid.innerHTML = '';
+
+            if (savedDesigns.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color: var(--text-secondary); padding: 40px;">No saved designs yet.</p>`;
+                return;
+            }
+
+            savedDesigns.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = 'saved-card';
+                card.innerHTML = `
+                    <div class="saved-preview-box">
+                        <div style="position:relative; width: 180px; height: 210px; transform: scale(0.65);">${item.svgMarkup}</div>
+                    </div>
+                    <div class="saved-card-body">
+                        <h4 style="font-size:14px; font-weight:800; color:var(--accent-pink);">"${item.text}"</h4>
+                        <div style="font-size:11px; color:var(--text-secondary); display:flex; flex-direction:column; gap:4px;">
+                            <span><i class="fas fa-palette"></i> Shirt Color: ${item.shirtColor}</span>
+                            <span><i class="fas fa-calendar"></i> Date: ${item.date}</span>
+                        </div>
+                        <button class="btn-primary" style="padding:8px 12px; font-size:11px; justify-content:center; margin-top:5px;" onclick="addSavedDesignToCart('${item.text}', '${item.shirtColor}')">
+                            <i class="fas fa-cart-plus"></i> Add Design to Cart
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function addSavedDesignToCart(text, color) {
+            const title = `Custom Tee ["${text}" - ${color}]`;
+            cartItems.push({ name: title, price: 39.99, img: '7.jpeg', qty: 1 });
+            renderCart();
+            showToast("Design added to shopping cart!");
+            toggleCartDrawer();
+        }
+
+        function togglePaymentFields(method) {
+            const payBox = document.getElementById('paymentInfoBox');
+            const fileGroup = document.getElementById('screenshotGroup');
+            const nameEl = document.getElementById('payMethodName');
+
+            if (method === 'InstaPay' || method === 'Vodafone Cash') {
+                payBox.style.display = 'block';
+                fileGroup.style.display = 'flex';
+                nameEl.innerText = method;
+                document.getElementById('payScreenshot').required = true;
+            } else {
+                payBox.style.display = 'none';
+                fileGroup.style.display = 'none';
+                document.getElementById('payScreenshot').required = false;
+            }
+        }
+
+        document.getElementById('payScreenshot').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) { currentScreenshotData = evt.target.result; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function toggleCartDrawer() {
+            document.getElementById('cartOverlay').classList.toggle('open');
+        }
+
+        function addToCart(name, price, img) {
+            cartItems.push({ name, price, img: img || '7.jpeg', qty: 1 });
+            renderCart();
+            showToast(`Added "${name}" to cart`);
+        }
+
+        function addCustomToCart() {
+            const customTitle = `Custom Tee ["${currentCustomText}" - Color: ${currentShirtColor}]`;
+            cartItems.push({ name: customTitle, price: 39.99, img: '7.jpeg', qty: 1 });
+            renderCart();
+            showToast("Custom design added to cart!");
+            toggleCartDrawer();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItemsContainer');
+            container.innerHTML = '';
+            let total = 0;
+
+            if (cartItems.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color: var(--text-secondary); margin-top:20px;">Your cart is empty.</p>`;
+            }
+
+            cartItems.forEach((item) => {
+                total += item.price * item.qty;
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <img src="${item.img}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
+                    <div style="flex: 1;">
+                        <h4 style="font-size:12px;">${item.name}</h4>
+                        <p style="font-size:10px; color:var(--text-secondary);">$${item.price.toFixed(2)}</p>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('cartBadgeCount').innerText = cartItems.length;
+            document.getElementById('cartTotalPrice').innerText = `$${total.toFixed(2)}`;
+        }
+
+        function openOrderModal() {
+            if (cartItems.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+            toggleCartDrawer();
+            document.getElementById('orderModal').classList.add('open');
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.remove('open');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const payMethod = document.getElementById('payMethod').value;
+
+            const orderData = {
+                id: Date.now().toString().slice(-5),
+                customerName: document.getElementById('custName').value,
+                phone: document.getElementById('custPhone').value,
+                phone2: document.getElementById('custPhone2').value || 'N/A',
+                gov: document.getElementById('custGov').value,
+                address: document.getElementById('custAddress').value,
+                size: document.getElementById('custSize').value,
+                weight: document.getElementById('custWeight').value + ' kg',
+                color: document.getElementById('custColor').value,
+                paymentMethod: payMethod,
+                paymentScreenshot: (payMethod === 'InstaPay' || payMethod === 'Vodafone Cash') ? currentScreenshotData : 'N/A',
+                items: cartItems.map(i => i.name).join(' + '),
+                totalPrice: cartItems.reduce((acc, curr) => acc + curr.price, 0).toFixed(2),
+                date: new Date().toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
+            };
+
+            let storedOrders = JSON.parse(localStorage.getItem('moa_apparel_orders')) || [];
+            storedOrders.unshift(orderData);
+            localStorage.setItem('moa_apparel_orders', JSON.stringify(storedOrders));
+
+            cartItems = []; currentScreenshotData = '';
+            renderCart();
+            document.getElementById('checkoutForm').reset();
+            togglePaymentFields('');
+            closeOrderModal();
+            showToast("Order placed successfully!");
+            renderAdminOrders();
+        }
+
+        function renderAdminOrders() {
+            const orders = JSON.parse(localStorage.getItem('moa_apparel_orders')) || [];
+            const tbody = document.getElementById('adminOrdersTableBody');
+            tbody.innerHTML = '';
+            let totalRev = 0;
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 25px; color: var(--text-secondary);">No orders received yet.</td></tr>`;
+            } else {
+                orders.forEach((order) => {
+                    totalRev += parseFloat(order.totalPrice);
+                    let proofCol = '<span style="color:var(--text-secondary);">N/A</span>';
+                    if (order.paymentScreenshot && order.paymentScreenshot !== 'N/A') {
+                        proofCol = `<a href="${order.paymentScreenshot}" target="_blank"><img src="${order.paymentScreenshot}" class="screenshot-thumb" title="Click to View Proof"></a>`;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong style="color:var(--accent-pink);">#${order.id}</strong></td>
+                        <td><strong>${order.customerName}</strong><br><span style="font-size:10px; color:var(--text-secondary);"><i class="fas fa-phone"></i> ${order.phone}</span></td>
+                        <td><strong style="color:#fff;">${order.gov}</strong><p style="font-size:10px; color:var(--text-secondary);">${order.address}</p></td>
+                        <td style="max-width:180px;">${order.items}</td>
+                        <td><span style="background:var(--bg-lighter); padding:2px 6px; border-radius:4px; font-weight:bold; color:var(--accent-pink);">${order.size}</span><span style="font-size:11px; color:var(--text-secondary); display:block; margin-top:2px;">${order.weight} | ${order.color}</span></td>
+                        <td><strong style="color:var(--accent-yellow);">${order.paymentMethod || 'COD'}</strong></td>
+                        <td>${proofCol}</td>
+                        <td><strong style="color:var(--accent-green);">$${order.totalPrice}</strong></td>
+                        <td style="font-size:10px; color:var(--text-secondary);">${order.date}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('totalOrdersCount').innerText = orders.length;
+            document.getElementById('pendingOrdersCount').innerText = orders.length;
+            document.getElementById('totalRevenue').innerText = `$${totalRev.toFixed(2)}`;
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastText').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Canvas Background Animation
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = Array.from({ length: 50 }, () => ({
+            x: (Math.random() - 0.5) * canvas.width,
+            y: (Math.random() - 0.5) * canvas.height,
+            z: Math.random() * canvas.width,
+            size: 1.5
+        }));
+
+        function animate3D() {
+            ctx.fillStyle = 'rgba(10, 10, 12, 0.25)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+
+            particles.forEach(p => {
+                p.z -= 1;
+                if (p.z <= 0) p.z = canvas.width;
+                const k = 300 / p.z;
+                const px = p.x * k + cx, py = p.y * k + cy;
+
+                if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
+                    ctx.fillStyle = `rgba(255, 107, 139, ${1 - p.z / canvas.width})`;
+                    ctx.beginPath(); ctx.arc(px, py, p.size * k * 0.5, 0, Math.PI * 2); ctx.fill();
+                }
+            });
+            requestAnimationFrame(animate3D);
+        }
+        animate3D();
+    </script>
+</body>
+</html>
